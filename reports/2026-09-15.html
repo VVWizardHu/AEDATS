@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>技术服务部周报看板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECEEEC;
+    --panel:#F5F6F4;
+    --ink:#14181C;
+    --ink-soft:#4B5560;
+    --hair:#CBD1CE;
+    --teal:#1B6E68;
+    --teal-soft:#DCE9E7;
+    --amber:#C4842A;
+    --amber-soft:#F3E4CC;
+    --rust:#AE4A3C;
+    --rust-soft:#F2DDD9;
+    --moss:#4B7A54;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .num{ font-family:'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:40px 32px 64px; }
+
+  header{ display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom:2px solid var(--ink); padding-bottom:18px; margin-bottom:28px; }
+  header h1{ font-family:'IBM Plex Sans Condensed'; font-weight:700; font-size:30px;
+    letter-spacing:0.2px; margin:0; }
+  header .period{ font-size:14px; color:var(--ink-soft); margin-top:6px; }
+  header .pulled{ text-align:right; font-size:12px; color:var(--ink-soft); }
+  header .pulled .num{ font-size:13px; color:var(--ink); display:block; margin-top:2px; }
+
+  .kpi-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:36px; }
+  .kpi{ background:var(--panel); border:1px solid var(--hair); border-left:5px solid var(--teal); padding:16px 18px; }
+  .kpi.warn{ border-left-color:var(--amber); }
+  .kpi.risk{ border-left-color:var(--rust); }
+  .kpi .region{ font-weight:600; font-size:15px; }
+  .kpi .metrics{ display:flex; gap:22px; margin-top:12px; }
+  .kpi .metric-label{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; }
+  .kpi .metric-val{ font-size:22px; font-weight:600; margin-top:2px; }
+  .kpi .metric-val.small{ font-size:15px; font-weight:500; color:var(--ink-soft); }
+
+  section{ margin-bottom:40px; }
+  section h2{ font-family:'IBM Plex Sans Condensed'; font-weight:700; font-size:17px;
+    margin:0 0 4px; }
+  section .sub{ font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; }
+
+  .region-block{ margin-bottom:18px; }
+  .region-block .rlabel{ font-size:13px; font-weight:600; margin-bottom:6px; display:flex; justify-content:space-between; }
+  .region-block .rlabel .rtotal{ color:var(--ink-soft); font-weight:400; }
+  .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:5px; }
+  .bar-row .tier{ width:26px; font-size:11px; color:var(--ink-soft); flex-shrink:0; }
+  .bar-track{ flex:1; height:16px; background:#fff; border:1px solid var(--hair); position:relative; cursor:help; }
+  .bar-track:hover{ outline:2px solid var(--teal); outline-offset:1px; }
+  .ratio-track:hover{ outline:2px solid var(--teal); outline-offset:1px; }
+  .kpi{ cursor:help; }
+  [data-tip]{ position:relative; }
+  [data-tip]:hover::after{
+    content: attr(data-tip);
+    position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%);
+    background:var(--ink); color:#fff; font-family:"Noto Sans CJK SC","Noto Sans",Arial,sans-serif;
+    font-size:12px; line-height:1.5; white-space:nowrap; padding:6px 10px; z-index:50;
+    box-shadow:0 2px 8px rgba(0,0,0,0.25);
+  }
+  [data-tip]:hover::before{
+    content:''; position:absolute; left:50%; bottom:100%; transform:translateX(-50%);
+    border:5px solid transparent; border-top-color:var(--ink); margin-bottom:-2px; z-index:50;
+  }
+  .bar-fill{ height:100%; background:var(--teal); overflow:hidden; }
+  .bar-fill.na{ background:repeating-linear-gradient(135deg, var(--amber), var(--amber) 3px, var(--amber-soft) 3px, var(--amber-soft) 6px); }
+  .bar-val{ width:56px; text-align:right; font-size:12px; flex-shrink:0; }
+
+  .two-col{ display:grid; grid-template-columns:1.15fr 1fr; gap:32px; align-items:start; }
+
+  table.flat{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.flat th{ text-align:left; font-weight:600; font-size:11px; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:0.3px; border-bottom:1px solid var(--ink); padding:0 8px 6px 0; }
+  table.flat td{ padding:6px 8px 6px 0; border-bottom:1px solid var(--hair); }
+  table.flat td.num{ text-align:right; }
+  table.flat tr.total td{ font-weight:600; border-top:1px solid var(--ink); border-bottom:none; }
+  .delta-up{ color:var(--rust); }
+  .delta-down{ color:var(--moss); }
+
+  .ratio-row{ display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+  .ratio-row .rname{ width:120px; font-size:13px; font-weight:600; flex-shrink:0; }
+  .ratio-track{ flex:1; height:22px; background:#fff; border:1px solid var(--hair); position:relative; }
+  .ratio-fill{ height:100%; background:var(--teal); }
+  .ratio-fill.hot{ background:var(--rust); }
+  .ratio-pct{ width:52px; text-align:right; font-size:13px; font-weight:600; flex-shrink:0; }
+
+  footer{ border-top:1px solid var(--hair); padding-top:14px; font-size:11.5px; color:var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>技术服务部周报数据看板</h1>
+      <div class="period">周期 2026-09-14 ~ 09-20　·　数据来源 D365 CRM</div>
+    </div>
+    <div class="pulled">拉取时间<span class="num" id="pulledTime"></span></div>
+  </header>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <section>
+    <h2>Ticket 存量 — 分地区 × 层级</h2>
+    <div class="sub">条形长度为该层级存量占地区总存量的比例；斜纹填充部分为「无动作」（5个工作日无更新）</div>
+    <div id="ticketBars"></div>
+  </section>
+
+  <div class="two-col">
+    <section>
+      <h2>本周新增 / 关闭</h2>
+      <div class="sub">环比为与上周同期比较，红色=环比恶化，绿色=环比改善</div>
+      <table class="flat" id="deltaTable"></table>
+    </section>
+
+    <section>
+      <h2>Work Order — 分地区 × 类型</h2>
+      <div class="sub">存量，剔除已发货(Shipped)状态记录</div>
+      <table class="flat" id="woTable"></table>
+    </section>
+  </div>
+
+  <section>
+    <h2>Work Order / Ticket 存量比值</h2>
+    <div class="sub">该地区有多少比例的 Ticket 存量已转化为实体工单</div>
+    <div id="ratioBars"></div>
+  </section>
+
+  <section>
+    <h2>Hotline 情况</h2>
+    <div class="sub">数据来源 Genesys Cloud（voice queue），ROE 暂未配置电话队列</div>
+    <div id="hotlineBars"></div>
+  </section>
+
+  <footer>
+    Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus　·　地区范围仅覆盖德语区(DE/AT)、荷比卢、ROE，不含英国及非欧洲市场
+  </footer>
+
+</div>
+
+<script>
+const PULLED = new Date(1789488656877);
+document.getElementById('pulledTime').textContent =
+  PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+
+const regions = ['德语区(DE/AT)','荷比卢','ROE'];
+const tiers = ['L1','L2','L3','L4'];
+const types = ['发货','内部上门','服务商上门'];
+
+const stock = {"德语区(DE/AT)|L1":3085,"德语区(DE/AT)|L2":68,"德语区(DE/AT)|L3":515,"德语区(DE/AT)|L4":34,"荷比卢|L1":1079,"荷比卢|L2":133,"荷比卢|L3":428,"荷比卢|L4":23,"ROE|L1":727,"ROE|L2":22,"ROE|L3":213,"ROE|L4":9};
+const noAction = {"德语区(DE/AT)|L1":773,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":302,"德语区(DE/AT)|L4":1,"荷比卢|L1":136,"荷比卢|L2":49,"荷比卢|L3":271,"荷比卢|L4":0,"ROE|L1":413,"ROE|L2":2,"ROE|L3":184,"ROE|L4":5};
+const newThis = {"德语区(DE/AT)|L1":110,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":9,"荷比卢|L1":82,"荷比卢|L2":0,"荷比卢|L3":1,"荷比卢|L4":6,"ROE|L1":21,"ROE|L2":0,"ROE|L3":1,"ROE|L4":2};
+const newLast = {"德语区(DE/AT)|L1":395,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":3,"荷比卢|L1":199,"荷比卢|L2":4,"荷比卢|L3":16,"荷比卢|L4":2,"ROE|L1":41,"ROE|L2":5,"ROE|L3":1,"ROE|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":130,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":9,"德语区(DE/AT)|L4":1,"荷比卢|L1":164,"荷比卢|L2":13,"荷比卢|L3":5,"荷比卢|L4":0,"ROE|L1":10,"ROE|L2":0,"ROE|L3":5,"ROE|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0,"荷比卢|L1":194,"荷比卢|L2":7,"荷比卢|L3":3,"荷比卢|L4":1,"ROE|L1":39,"ROE|L2":2,"ROE|L3":2,"ROE|L4":0};
+
+const woStock = {"德语区(DE/AT)|发货":294,"德语区(DE/AT)|内部上门":65,"德语区(DE/AT)|服务商上门":79,"荷比卢|发货":97,"荷比卢|内部上门":69,"荷比卢|服务商上门":51,"ROE|发货":115,"ROE|内部上门":131,"ROE|服务商上门":1};
+
+function regionTotal(map, region, keys){
+  return keys.reduce((s,k)=> s + (map[region+'|'+k]||0), 0);
+}
+
+// ---- KPI row ----
+const kpiRow = document.getElementById('kpiRow');
+regions.forEach(reg=>{
+  const ticketTot = regionTotal(stock, reg, tiers);
+  const woTot = regionTotal(woStock, reg, types);
+  const naTot = regionTotal(noAction, reg, tiers);
+  const naPct = ticketTot ? Math.round(naTot/ticketTot*100) : 0;
+  const ratio = ticketTot ? (woTot/ticketTot*100) : 0;
+  const cls = naPct >= 45 ? 'risk' : (naPct >= 25 ? 'warn' : '');
+  kpiRow.insertAdjacentHTML('beforeend', `
+    <div class="kpi ${cls}" data-tip="${reg}：Ticket存量 ${ticketTot.toLocaleString()}，无动作 ${naTot.toLocaleString()}（${naPct}%），WorkOrder存量 ${woTot.toLocaleString()}（占Ticket ${ratio.toFixed(1)}%）">
+      <div class="region">${reg}</div>
+      <div class="metrics">
+        <div><div class="metric-label">Ticket 存量</div><div class="metric-val num">${ticketTot.toLocaleString()}</div></div>
+        <div><div class="metric-label">无动作占比</div><div class="metric-val num">${naPct}%</div></div>
+        <div><div class="metric-label">WO/Ticket</div><div class="metric-val small num">${ratio.toFixed(1)}%</div></div>
+      </div>
+    </div>`);
+});
+
+// ---- Ticket bars ----
+const ticketBars = document.getElementById('ticketBars');
+regions.forEach(reg=>{
+  const tot = regionTotal(stock, reg, tiers);
+  let rows = '';
+  tiers.forEach(t=>{
+    const k = reg+'|'+t;
+    const s = stock[k]||0;
+    const na = noAction[k]||0;
+    const pct = tot ? (s/tot*100) : 0;
+    const naPct = s ? (na/s*100) : 0;
+    rows += `<div class="bar-row">
+      <div class="tier">${t}</div>
+      <div class="bar-track" data-tip="${t} 存量 ${s.toLocaleString()}，其中无动作 ${na.toLocaleString()}（${naPct.toFixed(0)}%）"><div class="bar-fill" style="width:${pct}%">
+        <div class="bar-fill na" style="width:${naPct}%; float:right; height:100%;"></div>
+      </div></div>
+      <div class="bar-val num">${s.toLocaleString()}</div>
+    </div>`;
+  });
+  ticketBars.insertAdjacentHTML('beforeend', `
+    <div class="region-block">
+      <div class="rlabel"><span>${reg}</span><span class="rtotal num">合计 ${tot.toLocaleString()}</span></div>
+      ${rows}
+    </div>`);
+});
+
+// ---- Delta table (new/closed) ----
+const deltaTable = document.getElementById('deltaTable');
+let dRows = `<tr><th>地区</th><th class="num" style="text-align:right">新增</th><th class="num" style="text-align:right">环比</th><th class="num" style="text-align:right">关闭</th><th class="num" style="text-align:right">环比</th></tr>`;
+regions.forEach(reg=>{
+  const nt = regionTotal(newThis, reg, tiers), nl = regionTotal(newLast, reg, tiers);
+  const ct = regionTotal(closedThis, reg, tiers), cl = regionTotal(closedLast, reg, tiers);
+  const nd = nt-nl, cd = ct-cl;
+  const ndCls = nd>0?'delta-up':(nd<0?'delta-down':'');
+  const cdCls = cd>0?'delta-down':(cd<0?'delta-up':''); // closing more = good = green
+  dRows += `<tr><td>${reg}</td><td class="num" style="text-align:right">${nt}</td>
+    <td class="num ${ndCls}" style="text-align:right">${nd>0?'+':''}${nd}</td>
+    <td class="num" style="text-align:right">${ct}</td>
+    <td class="num ${cdCls}" style="text-align:right">${cd>0?'+':''}${cd}</td></tr>`;
+});
+deltaTable.innerHTML = dRows;
+
+// ---- WO table ----
+const woTable = document.getElementById('woTable');
+let wRows = `<tr><th>地区</th><th class="num" style="text-align:right">发货</th><th class="num" style="text-align:right">内部上门</th><th class="num" style="text-align:right">服务商上门</th><th class="num" style="text-align:right">合计</th></tr>`;
+regions.forEach(reg=>{
+  const a = woStock[reg+'|发货']||0, b = woStock[reg+'|内部上门']||0, c = woStock[reg+'|服务商上门']||0;
+  wRows += `<tr><td>${reg}</td><td class="num" style="text-align:right">${a}</td><td class="num" style="text-align:right">${b}</td><td class="num" style="text-align:right">${c}</td><td class="num" style="text-align:right;font-weight:600">${a+b+c}</td></tr>`;
+});
+woTable.innerHTML = wRows;
+
+// ---- Ratio bars ----
+const ratioBars = document.getElementById('ratioBars');
+const maxRatio = 30;
+regions.forEach(reg=>{
+  const ticketTot = regionTotal(stock, reg, tiers);
+  const woTot = regionTotal(woStock, reg, types);
+  const ratio = ticketTot ? (woTot/ticketTot*100) : 0;
+  const hot = ratio > 20;
+  ratioBars.insertAdjacentHTML('beforeend', `
+    <div class="ratio-row">
+      <div class="rname">${reg}</div>
+      <div class="ratio-track" data-tip="${reg}：WorkOrder存量 ${woTot.toLocaleString()} / Ticket存量 ${ticketTot.toLocaleString()} = ${ratio.toFixed(1)}%"><div class="ratio-fill ${hot?'hot':''}" style="width:${Math.min(ratio/maxRatio*100,100)}%"></div></div>
+      <div class="ratio-pct num">${ratio.toFixed(1)}%</div>
+    </div>`);
+});
+// ---- Hotline bars (per queue/line) ----
+const hotlineQueues = {
+  "德语区(DE/AT)": [
+    {name:"GER-On-Site", offer:6, answer:4, abandon:2},
+    {name:"GER_End_User", offer:133, answer:10, abandon:58},
+    {name:"GER_Installer", offer:4, answer:4, abandon:0},
+  ],
+  "荷比卢": [
+    {name:"BEL_End_User", offer:9, answer:6, abandon:2},
+    {name:"BEL_Field_Service", offer:12, answer:6, abandon:6},
+    {name:"BEL_Installer", offer:4, answer:4, abandon:0},
+    {name:"NLD_End_User", offer:19, answer:5, abandon:9},
+    {name:"NLD_Field_Service", offer:17, answer:13, abandon:4},
+    {name:"NLD_Installer", offer:17, answer:16, abandon:1},
+  ],
+};
+const hotlineBars = document.getElementById('hotlineBars');
+const allQueues = Object.values(hotlineQueues).flat();
+const maxOffer = Math.max(...allQueues.map(q=>q.offer));
+regions.forEach(reg=>{
+  const queues = hotlineQueues[reg];
+  if(!queues){
+    hotlineBars.insertAdjacentHTML('beforeend', `
+      <div class="region-block">
+        <div class="rlabel"><span>${reg}</span><span class="rtotal num">暂无队列数据</span></div>
+      </div>`);
+    return;
+  }
+  const regionTotal = queues.reduce((s,q)=>s+q.offer,0);
+  const regionAnswer = queues.reduce((s,q)=>s+q.answer,0);
+  const regionAbandon = queues.reduce((s,q)=>s+q.abandon,0);
+  let rows = '';
+  queues.forEach(q=>{
+    const w = q.offer/maxOffer*100;
+    const answerPct = q.answer/q.offer*100;
+    const abandonPct = q.abandon/q.offer*100;
+    rows += `
+      <div class="bar-row">
+        <div class="tier" style="width:130px;">${q.name}</div>
+        <div class="bar-track" data-tip="${q.name}：来电 ${q.offer}，接起 ${q.answer}（${answerPct.toFixed(0)}%），放弃 ${q.abandon}（${abandonPct.toFixed(0)}%）"><div class="bar-fill" style="width:${w}%">
+          <div class="bar-fill na" style="width:${abandonPct}%; float:right; height:100%;"></div>
+        </div></div>
+        <div class="bar-val num" style="width:230px;text-align:left;padding-left:10px;">
+          来电 ${q.offer}　接起率 <b>${answerPct.toFixed(0)}%</b>　放弃率 <b class="${abandonPct>=30?'delta-up':''}">${abandonPct.toFixed(0)}%</b>
+        </div>
+      </div>`;
+  });
+  hotlineBars.insertAdjacentHTML('beforeend', `
+    <div class="region-block">
+      <div class="rlabel"><span>${reg}</span><span class="rtotal num">合计来电 ${regionTotal}　接起率 ${(regionAnswer/regionTotal*100).toFixed(1)}%　放弃率 ${(regionAbandon/regionTotal*100).toFixed(1)}%</span></div>
+      ${rows}
+    </div>`);
+});
+</script>
+</body>
+</html>
