@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* 配色方案：冷灰底 + 蓝主色（2026-09 改版） */
-    --paper:#F2F5F9; --panel:#F8FAFC; --card:#FFFFFF; --ink:#0F172A; --ink-soft:#64748B;
-    --hair:#E2E8F0; --teal:#2563EB; --teal-soft:#DBEAFE; --amber:#D97706; --amber-soft:#FDE68A;
-    --rust:#DC2626; --rust-soft:#FEE2E2; --moss:#7C3AED;
+    /* 配色：柔和低饱和（祥和感）—— 鼠尾草青绿 + 沙色 + 陶土色 */
+    --paper:#F4F6F4; --panel:#FAFBFA; --card:#FFFFFF; --ink:#333F3D; --ink-soft:#7C8A87;
+    --hair:#E3E8E5; --teal:#6A9C94; --teal-soft:#E4EEEC; --amber:#D3A76A; --amber-soft:#F7EDDD;
+    --rust:#C98A76; --rust-soft:#F5E5DF; --moss:#A9A0C4; --blue:#8FA8B8;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--paper);color:var(--ink);
@@ -35,6 +35,16 @@
   .kpi .k-label{font-size:11px;color:var(--ink-soft);letter-spacing:.5px;text-transform:uppercase;}
   .kpi .k-val{font-size:30px;font-weight:600;line-height:1.15;margin-top:6px;}
   .kpi .k-sub{font-size:11.5px;color:var(--ink-soft);margin-top:5px;}
+  /* 重点指标高亮 */
+  .kpi.emph{border-top-width:4px;border-top-color:var(--rust);
+    background:linear-gradient(180deg,var(--rust-soft) 0%,var(--card) 62%);}
+  .kpi.emph2{border-top-width:4px;border-top-color:var(--amber);
+    background:linear-gradient(180deg,var(--amber-soft) 0%,var(--card) 62%);}
+  .kpi .badge{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9px;
+    background:var(--rust);color:#fff;margin-left:7px;vertical-align:3px;letter-spacing:.3px;}
+  .kpi .badge.sand{background:var(--amber);}
+  tr.hot td{background:var(--amber-soft);font-weight:600;}
+  tr.hot td:first-child{border-left:3px solid var(--amber);padding-left:9px;}
 
   .card{background:var(--card);border:1px solid var(--hair);padding:20px 22px 22px;margin-bottom:20px;}
   .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:17px;margin:0 0 3px;}
@@ -65,11 +75,16 @@
   /* ---- 账龄 ---- */
   .stack .seg.g1{background:var(--rust);}
   .stack .seg.g2{background:var(--amber);}
-  .stack .seg.g3{background:var(--teal);}
+  .stack .seg.g3{background:var(--blue);}
   .age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
   .age-cell{border:1px solid var(--hair);background:var(--panel);padding:14px 16px;border-top:4px solid var(--rust);}
   .age-cell.a2{border-top-color:var(--amber);}
-  .age-cell.a3{border-top-color:var(--teal);}
+  .age-cell.a3{border-top-color:var(--blue);}
+  .age-cell.hot{border:1px solid var(--rust);border-top:5px solid var(--rust);
+    background:linear-gradient(180deg,var(--rust-soft) 0%,var(--panel) 58%);}
+  .age-cell.hot .a-val{font-size:30px;}
+  .age-cell .a-flag{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9px;
+    background:var(--rust);color:#fff;margin-left:6px;vertical-align:2px;}
   .age-cell .a-name{font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;}
   .age-cell .a-val{font-size:26px;font-weight:600;line-height:1.2;margin-top:6px;}
   .age-cell .a-share{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
@@ -168,7 +183,7 @@
 </div>
 
 <script>
-const PULLED = new Date(1789552297022);
+const PULLED = new Date(1789552569998);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -185,7 +200,7 @@ const closedThis = {"德语区(DE/AT)|L1":160,"德语区(DE/AT)|L2":0,"德语区
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
 const woStock = {"德语区(DE/AT)|发货":291,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
 const ageAll = {"德语区(DE/AT)|>3m":327,"德语区(DE/AT)|1-3m":967,"德语区(DE/AT)|<1m":1433};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":240,"德语区(DE/AT)|<1m":1002};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":240,"德语区(DE/AT)|<1m":1001};
 
 const REG = regions[0];
 function sum(map, keys){ return keys.reduce((s,k)=> s + (map[REG+'|'+k]||0), 0); }
@@ -201,11 +216,19 @@ const woPct = ticketTot ? (woTot / ticketTot * 100) : 0;
 const nt = sum(newThis, tiers), nl = sum(newLast, tiers);
 const ct = sum(closedThis, tiers), cl = sum(closedLast, tiers);
 const naCls = naPct >= 45 ? 'risk' : (naPct >= 25 ? 'warn' : '');
+const oldTot = ageAll[REG+'|>3m'] || 0;
+const oldShare = ticketTot ? (oldTot / ticketTot * 100) : 0;
+const internalWO = woStock[REG+'|内部上门'] || 0;
 document.getElementById('kpiRow').innerHTML = `
   <div class="kpi">
     <div class="k-label">Ticket 存量</div>
     <div class="k-val num">${fmt(ticketTot)}</div>
     <div class="k-sub">未关闭待处理客诉</div>
+  </div>
+  <div class="kpi emph">
+    <div class="k-label">超 3 个月未关闭<span class="badge">积压</span></div>
+    <div class="k-val num">${fmt(oldTot)}</div>
+    <div class="k-sub">占存量 ${oldShare.toFixed(1)}% · 优先清理</div>
   </div>
   <div class="kpi ${naCls}">
     <div class="k-label">无动作</div>
@@ -222,10 +245,10 @@ document.getElementById('kpiRow').innerHTML = `
     <div class="k-val num">${fmt(ct)}</div>
     <div class="k-sub">上周 ${fmt(cl)} · 环比 ${(ct-cl>0?'+':'')}${fmt(ct-cl)}</div>
   </div>
-  <div class="kpi muted">
-    <div class="k-label">WO 存量</div>
-    <div class="k-val num">${fmt(woTot)}</div>
-    <div class="k-sub">发货/内部/服务商　占 Ticket ${woPct.toFixed(1)}%</div>
+  <div class="kpi emph2">
+    <div class="k-label">WO 内部上门<span class="badge sand">自有团队</span></div>
+    <div class="k-val num">${fmt(internalWO)}</div>
+    <div class="k-sub">自有团队上门工单存量</div>
   </div>`;
 
 // ---- Ticket 分层：堆叠占比条 + 数字块 ----
@@ -262,8 +285,8 @@ ageKeys.forEach((k, i)=>{
   const share = ageAllTot ? (v / ageAllTot * 100) : 0;
   aSegs += `<div class="seg g${i+1}" style="width:${share}%" title="${ageLabels[k]} ${fmt(v)}">${share >= 8 ? k : ''}</div>`;
   aCells += `
-    <div class="age-cell a${i+1}">
-      <div class="a-name">${ageLabels[k]}</div>
+    <div class="age-cell a${i+1}${k === '>3m' ? ' hot' : ''}">
+      <div class="a-name">${ageLabels[k]}${k === '>3m' ? '<span class="a-flag">优先清理</span>' : ''}</div>
       <div class="a-val num">${fmt(v)}</div>
       <div class="a-share">占未关闭 ${share.toFixed(1)}%</div>
       <div class="a-new">新建未处理 <b>${fmt(nv)}</b>${nv ? `（占本档 ${(v ? nv/v*100 : 0).toFixed(0)}%）` : ''}</div>
@@ -290,7 +313,7 @@ document.getElementById('deltaTable').innerHTML = `
 let wRows = '';
 types.forEach(t=>{
   const v = woStock[REG+'|'+t] || 0;
-  wRows += `<tr><td>${t}</td><td class="num">${fmt(v)}</td></tr>`;
+  wRows += `<tr${t === '内部上门' ? ' class="hot"' : ''}><td>${t}${t === '内部上门' ? ' · 自有团队' : ''}</td><td class="num">${fmt(v)}</td></tr>`;
 });
 wRows += `<tr class="total"><td>合计</td><td class="num">${fmt(woTot)}</td></tr>`;
 wRows += `<tr><td style="color:var(--ink-soft)">已转上门工单<br><span style="font-size:11px">（不计入 Ticket 存量）</span></td><td class="num" style="color:var(--ink-soft)">${fmt(onsiteTot)}</td></tr>`;
