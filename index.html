@@ -108,7 +108,7 @@
 
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
   .two-col .card{margin-bottom:14px;display:flex;flex-direction:column;}
-  .two-col .card .tbl-fill{margin-top:auto;}
+  .two-col .card .note{margin-top:auto;}
   @media (max-width:820px){.two-col{grid-template-columns:1fr;}}
 
   /* ---- Hotline ---- */
@@ -173,7 +173,7 @@
       <h2>Work Order 存量 · 分类型</h2>
       <div class="sub">未完成工单，剔除已发货(Shipped)</div>
       <div class="tbl-fill"><table id="woTable"></table></div>
-      <div class="note">已转上门工单单独列出，不计入 Ticket 存量</div>
+      <div class="note" id="woNote"></div>
     </div>
   </div>
 
@@ -190,12 +190,13 @@
 
   <footer>
     Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>
-    地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）</footer>
+    地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）
+  </footer>
 
 </div>
 
 <script>
-const PULLED = new Date(1789553032014);
+const PULLED = new Date(0);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -203,16 +204,16 @@ const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
 
-const stock = {"德语区(DE/AT)|L1":2545,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":101,"德语区(DE/AT)|L4":14};
-const noAction = {"德语区(DE/AT)|L1":437,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":416,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":141,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":2};
-const newLast = {"德语区(DE/AT)|L1":395,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":2};
-const closedThis = {"德语区(DE/AT)|L1":160,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":9,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":290,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
-const ageAll = {"德语区(DE/AT)|>3m":327,"德语区(DE/AT)|1-3m":967,"德语区(DE/AT)|<1m":1433};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":240,"德语区(DE/AT)|<1m":1001};
+const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
+const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
 
 const REG = regions[0];
 function sum(map, keys){ return keys.reduce((s,k)=> s + (map[REG+'|'+k]||0), 0); }
@@ -328,8 +329,11 @@ types.forEach(t=>{
   wRows += `<tr${t === '内部上门' ? ' class="hot"' : ''}><td>${t}${t === '内部上门' ? ' · 自有团队' : ''}</td><td class="num">${fmt(v)}</td></tr>`;
 });
 wRows += `<tr class="total"><td>合计</td><td class="num">${fmt(woTot)}</td></tr>`;
-wRows += `<tr><td style="color:var(--ink-soft)">已转上门工单<br><span style="font-size:11px">（不计入 Ticket 存量）</span></td><td class="num" style="color:var(--ink-soft)">${fmt(onsiteTot)}</td></tr>`;
 document.getElementById('woTable').innerHTML = wRows;
+document.getElementById('woNote').innerHTML =
+  `已转上门工单 <b class="num">${fmt(onsiteTot)}</b> 条单独统计，不计入 Ticket 存量`;
+const woNoteB = document.querySelector('#woNote b');
+if (woNoteB) woNoteB.style.fontFamily = "'IBM Plex Mono',monospace";
 
 // ---- Hotline ----
 const hotlineQueues = {
