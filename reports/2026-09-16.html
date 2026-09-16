@@ -23,9 +23,9 @@
     border-bottom:2px solid var(--ink);padding-bottom:13px;margin-bottom:16px;}
   header h1{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:28px;margin:0;letter-spacing:.2px;}
   header .period{font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
-  .hright{display:flex;flex-direction:column;align-items:flex-end;gap:9px;}
-  header .pulled{text-align:right;font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;}
-  header .pulled .num{font-size:14px;color:var(--ink);display:block;margin-top:3px;letter-spacing:0;text-transform:none;}
+  .hright{display:flex;align-items:center;gap:16px;}
+  header .pulled{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+  header .pulled .num{font-size:13px;color:var(--ink);margin-left:6px;letter-spacing:0;text-transform:none;}
   /* 语言切换 */
   .lang{display:inline-flex;border:1px solid var(--hair);background:var(--panel);border-radius:3px;overflow:hidden;}
   .lang button{font:inherit;font-size:11.5px;line-height:1;padding:6px 12px;border:0;background:transparent;
@@ -98,47 +98,41 @@
   .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:16.5px;margin:0 0 2px;}
   .card .sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;}
 
-  /* ---- 分层：堆叠占比条 + 数字块 ---- */
-  .stack{display:flex;height:24px;border:1px solid var(--hair);overflow:hidden;margin-bottom:12px;}
-  .stack .seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
+  /* ---- 分层 / 账龄：紧凑堆叠条 + 两行单元格 ---- */
+  .blk + .blk{margin-top:12px;padding-top:11px;border-top:1px dashed var(--hair);}
+  .blk-name{font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.4px;margin-bottom:5px;}
+  .stack{display:flex;height:21px;border:1px solid var(--hair);overflow:hidden;margin-bottom:9px;}
+  .stack .seg{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;
     color:#fff;min-width:2px;white-space:nowrap;overflow:hidden;}
   .stack .seg.s1{background:var(--teal);}
   .stack .seg.s2{background:var(--amber);}
   .stack .seg.s3{background:var(--rust);}
   .stack .seg.s4{background:var(--moss);}
-  .tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-  .tier-cell{border:1px solid var(--hair);border-left:4px solid var(--teal);padding:12px 14px;background:var(--panel);}
-  .tier-cell.c2{border-left-color:var(--amber);}
-  .tier-cell.c3{border-left-color:var(--rust);}
-  .tier-cell.c4{border-left-color:var(--moss);}
-  .tier-cell .t-name{font-size:11.5px;color:var(--ink-soft);letter-spacing:.4px;font-weight:600;}
-  .tier-cell .t-val{font-size:24px;font-weight:600;line-height:1.2;margin-top:4px;}
-  .tier-cell .t-share{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .tier-cell .t-na{font-size:11.5px;margin-top:8px;padding-top:7px;border-top:1px dashed var(--hair);}
-  .tier-cell .t-na b{font-family:'IBM Plex Mono',monospace;}
-  .tier-cell .t-na.warn{color:var(--amber);}
-  .tier-cell .t-na.risk{color:var(--rust);}
-  @media (max-width:820px){.tier-grid{grid-template-columns:repeat(2,1fr);}}
-
-  /* ---- 账龄 ---- */
   .stack .seg.g1{background:var(--rust);}
   .stack .seg.g2{background:var(--amber);}
   .stack .seg.g3{background:var(--blue);}
-  .age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-  .age-cell{border:1px solid var(--hair);background:var(--panel);padding:14px 16px;border-top:4px solid var(--rust);}
+  .tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .tier-cell,.age-cell{border:1px solid var(--hair);border-left:4px solid var(--teal);
+    padding:8px 11px;background:var(--panel);}
+  .tier-cell.c2{border-left-color:var(--amber);}
+  .tier-cell.c3{border-left-color:var(--rust);}
+  .tier-cell.c4{border-left-color:var(--moss);}
+  .age-cell{border-left:1px solid var(--hair);border-top:4px solid var(--rust);}
   .age-cell.a2{border-top-color:var(--amber);}
   .age-cell.a3{border-top-color:var(--blue);}
   .age-cell.hot{border:1px solid var(--rust);border-top:5px solid var(--rust);
-    background:linear-gradient(180deg,var(--rust-soft) 0%,var(--panel) 58%);}
-  .age-cell.hot .a-val{font-size:30px;}
-  .age-cell .a-flag{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9px;
-    background:var(--rust);color:#fff;margin-left:6px;vertical-align:2px;}
-  .age-cell .a-name{font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;}
-  .age-cell .a-val{font-size:26px;font-weight:600;line-height:1.2;margin-top:6px;}
-  .age-cell .a-share{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .age-cell .a-new{margin-top:10px;padding-top:9px;border-top:1px dashed var(--hair);font-size:12px;color:var(--ink-soft);}
-  .age-cell .a-new b{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--ink);}
-  @media (max-width:820px){.age-grid{grid-template-columns:1fr;}}
+    background:linear-gradient(180deg,var(--rust-soft) 0%,var(--panel) 62%);}
+  .tier-cell .t-name,.age-cell .a-name{display:flex;align-items:baseline;gap:7px;
+    font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;line-height:1.3;}
+  .tier-cell .t-val,.age-cell .a-val{font-size:22px;font-weight:600;color:var(--ink);}
+  .age-cell.hot .a-val{font-size:25px;}
+  .tier-cell .t-meta,.age-cell .a-meta{font-size:10.5px;color:var(--ink-soft);margin-top:3px;line-height:1.45;}
+  .tier-cell .t-meta.warn,.age-cell .a-meta.warn{color:var(--amber);}
+  .tier-cell .t-meta.risk,.age-cell .a-meta.risk{color:var(--rust);}
+  .age-cell .a-flag{display:inline-block;font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:8px;
+    background:var(--rust);color:#fff;vertical-align:1px;}
+  @media (max-width:820px){.tier-grid{grid-template-columns:repeat(2,1fr);}.age-grid{grid-template-columns:1fr;}}
 
   /* ---- 表格 ---- */
   table{width:100%;border-collapse:collapse;font-size:13px;}
@@ -216,14 +210,16 @@
         <div class="card">
           <h2 id="tierTitle"></h2>
           <div class="sub" id="tierSub"></div>
-          <div class="stack" id="tierStack"></div>
-          <div class="tier-grid" id="tierGrid"></div>
-        </div>
-        <div class="card">
-          <h2 id="ageTitle"></h2>
-          <div class="sub" id="ageSub"></div>
-          <div class="stack" id="ageStackAll"></div>
-          <div class="age-grid" id="ageGrid"></div>
+          <div class="blk">
+            <div class="blk-name" id="tierBlkName"></div>
+            <div class="stack" id="tierStack"></div>
+            <div class="tier-grid" id="tierGrid"></div>
+          </div>
+          <div class="blk">
+            <div class="blk-name" id="ageBlkName"></div>
+            <div class="stack" id="ageStackAll"></div>
+            <div class="age-grid" id="ageGrid"></div>
+          </div>
         </div>
         <div class="two-col">
           <div class="card">
@@ -261,27 +257,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789567410436);
+const PULLED = new Date(1789567998693);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2534,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":88,"德语区(DE/AT)|L4":26};
+const stock = {"德语区(DE/AT)|L1":2535,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":87,"德语区(DE/AT)|L4":26};
 const noAction = {"德语区(DE/AT)|L1":434,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":428,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":153,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
+const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":429,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":154,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
 const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
 const closedThis = {"德语区(DE/AT)|L1":178,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":297,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":81};
-const ageAll = {"德语区(DE/AT)|>3m":328,"德语区(DE/AT)|1-3m":961,"德语区(DE/AT)|<1m":1426};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":234,"德语区(DE/AT)|<1m":984};
+const woStock = {"德语区(DE/AT)|发货":298,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":81};
+const ageAll = {"德语区(DE/AT)|>3m":327,"德语区(DE/AT)|1-3m":961,"德语区(DE/AT)|<1m":1427};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":233,"德语区(DE/AT)|<1m":980};
 const weekStart = new Date(1789336800000);
-const trengoNew = 1;            // DA WA 新单待分派
-const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 25;       // DA WA 处理中
+const trengoNew = 0;            // DA WA 新单待分派
+const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 26;       // DA WA 处理中
 const trengoClosedThis = 133;     // DA WA 本周已处理
 const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789567410436);
+const TRENGO_PULLED = new Date(1789567998693);
 
 /* ========== 双语词典 ========== */
 const I18N = {
@@ -295,7 +291,8 @@ const I18N = {
     kNew:'本周新增', kNewSub:'上周 {p} · 环比 {d}',
     kClosed:'本周关闭', kClosedSub:'上周 {p} · 环比 {d}',
     kWO:'WO 内部上门', kWOSub:'自有团队上门工单存量', bOwn:'自有团队',
-    tierTitle:'Ticket 存量 · 分层级',
+    tierTitle:'Ticket 存量结构 · 分层级与账龄',
+    tierBlk:'按客诉等级（L1–L4）', ageBlk:'按创建时间账龄（未关闭）',
     tierSub:'合计 {tot} · 其中无动作 {na}（{pct}%）　｜　占比条 = 各层级构成',
     tierShare:'占 DA 存量 {s}', tierNa:'无动作',
     ageTitle:'客诉账龄 · 未关闭 / 新建未处理',
@@ -331,7 +328,8 @@ const I18N = {
     kNew:'Neu diese Woche', kNewSub:'Vorwoche {p} · Δ {d}',
     kClosed:'Geschlossen diese Woche', kClosedSub:'Vorwoche {p} · Δ {d}',
     kWO:'WO Innen-Onsite', kWOSub:'Offene Onsite-Aufträge des eigenen Teams', bOwn:'Eigenes Team',
-    tierTitle:'Ticket-Bestand · nach Ebene',
+    tierTitle:'Ticket-Struktur · Ebene & Alter',
+    tierBlk:'nach Ebene (L1–L4)', ageBlk:'nach Alter (offen)',
     tierSub:'Gesamt {tot} · davon ohne Aktivität {na} ({pct} %)　|　Balken = Zusammensetzung nach Ebene',
     tierShare:'Anteil am DA-Bestand {s}', tierNa:'ohne Aktivität',
     ageTitle:'Fallalter · offen / neu & unbearbeitet',
@@ -457,10 +455,8 @@ function render(){
     const c = naPctT >= 45 ? 'risk' : (naPctT >= 25 ? 'warn' : '');
     cells += `
       <div class="tier-cell c${i+1}">
-        <div class="t-name">${tr}</div>
-        <div class="t-val num">${fmt(s)}</div>
-        <div class="t-share">${t('tierShare', {s: pc(share)})}</div>
-        <div class="t-na ${c}">${t('tierNa')} <b>${fmt(na)}</b>（${pc(naPctT, 0)}）</div>
+        <div class="t-name">${tr}<span class="t-val num">${fmt(s)}</span></div>
+        <div class="t-meta ${c}">${t('tierShare', {s: pc(share)})} · ${t('tierNa')} ${fmt(na)}（${pc(naPctT, 0)}）</div>
       </div>`;
   });
   document.getElementById('tierTitle').textContent = t('tierTitle');
@@ -481,17 +477,15 @@ function render(){
     aSegs += `<div class="seg g${i+1}" style="width:${share}%" title="${lbl} ${fmt(v)}">${share >= 8 ? k : ''}</div>`;
     aCells += `
       <div class="age-cell a${i+1}${k === '>3m' ? ' hot' : ''}">
-        <div class="a-name">${lbl}${k === '>3m' ? `<span class="a-flag">${t('ageFlag')}</span>` : ''}</div>
-        <div class="a-val num">${fmt(v)}</div>
-        <div class="a-share">${t('ageShare', {s: pc(share)})}</div>
-        <div class="a-new">${t('ageNew')} <b>${fmt(nv)}</b>${nv ? `（${t('ageOf', {s: pc(v ? nv/v*100 : 0, 0)})}）` : ''}</div>
+        <div class="a-name">${lbl}<span class="a-val num">${fmt(v)}</span>${k === '>3m' ? `<span class="a-flag">${t('ageFlag')}</span>` : ''}</div>
+        <div class="a-meta">${t('ageShare', {s: pc(share)})} · ${t('ageNew')} ${fmt(nv)}${nv ? `（${t('ageOf', {s: pc(v ? nv/v*100 : 0, 0)})}）` : ''}</div>
       </div>`;
   });
-  document.getElementById('ageTitle').textContent = t('ageTitle');
+  document.getElementById('tierBlkName').textContent = t('tierBlk');
+  document.getElementById('ageBlkName').textContent =
+    t('ageBlk') + '　·　' + t('ageSub', {tot: fmt(ageAllTot), nw: fmt(ageNewTot)});
   document.getElementById('ageStackAll').innerHTML = aSegs;
   document.getElementById('ageGrid').innerHTML = aCells;
-  document.getElementById('ageSub').textContent =
-    t('ageSub', {tot: fmt(ageAllTot), nw: fmt(ageNewTot)});
 
   // ---- 本周变化 ----
   document.getElementById('deltaTitle').textContent = t('deltaTitle');
