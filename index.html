@@ -322,27 +322,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789570826871);
+const PULLED = new Date(0);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2528,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":82,"德语区(DE/AT)|L4":27};
-const noAction = {"德语区(DE/AT)|L1":428,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":551,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":433,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":158,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
-const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
-const closedThis = {"德语区(DE/AT)|L1":188,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":300,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
-const ageAll = {"德语区(DE/AT)|>3m":325,"德语区(DE/AT)|1-3m":951,"德语区(DE/AT)|<1m":1428};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":230,"德语区(DE/AT)|<1m":977};
-const weekStart = new Date(1789336800000);
-const trengoNew = 1;            // DA WA 新单待分派
-const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 15;       // DA WA 处理中
-const trengoClosedThis = 145;     // DA WA 本周已处理
-const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789573232887);
+const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
+const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const weekStart = new Date(0);
+const trengoNew = 0;            // DA WA 新单待分派
+const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 0;       // DA WA 处理中
+const trengoClosedThis = 0;     // DA WA 本周已处理
+const trengoClosedLast = 0;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(0);
 
 /* ========== 双语词典 ========== */
 const I18N = {
@@ -350,7 +350,7 @@ const I18N = {
     pageTitle:'DA 技术服务日常看板',
     period:'周期 {p}　·　数据来源 D365 CRM',
     pulled:'拉取时间',
-    agoNow:'刚刚', agoMin:'{n} 分钟前', agoHr:'{n} 小时前', freshTitle:'数据新鲜度',
+    agoNow:'刚刚', agoMin:'{n} 分钟前', agoHr:'{n} 小时前', freshTitle:'数据新鲜度', autoRefresh:'· 每 5 分钟自动检查更新',
     kStock:'Ticket 存量', kStockSub:'未关闭待处理客诉',
     kOld:'超 3 个月未关闭', kOldSub:'占存量 {s} · 优先清理', bOld:'积压',
     kNa:'无动作', kNaSub:'{n} 条 · 5 个工作日无更新',
@@ -388,7 +388,7 @@ const I18N = {
     pageTitle:'DA Technischer Service – Tagesübersicht',
     period:'Zeitraum {p}　·　Datenquelle: D365 CRM',
     pulled:'Abgerufen',
-    agoNow:'gerade eben', agoMin:'vor {n} Min.', agoHr:'vor {n} Std.', freshTitle:'Datenaktualität',
+    agoNow:'gerade eben', agoMin:'vor {n} Min.', agoHr:'vor {n} Std.', freshTitle:'Datenaktualität', autoRefresh:'· prüft alle 5 Min. automatisch',
     kStock:'Ticket-Bestand', kStockSub:'Offene, unbearbeitete Fälle',
     kOld:'Offen über 3 Monate', kOldSub:'{s} des Bestands · vorrangig bearbeiten', bOld:'Rückstand',
     kNa:'Ohne Aktivität', kNaSub:'{n} Fälle · 5 Werktage ohne Update',
@@ -446,6 +446,32 @@ function freshChip(ts){
   const cls = min <= 90 ? 'ok' : (min <= 240 ? 'warn' : 'stale');
   return `<span class="fresh ${cls}" title="${t('freshTitle')}"><i></i>${agoText(min)}</span>`;
 }
+
+/* 自动刷新：页面是静态的，cron 在服务端推送（CRM 每小时 / Trengo 每 20 分钟）。
+   打开的标签页不会自己重新拉取 —— 所以每 5 分钟（仅当页面可见时）带 cache-buster
+   取一次线上 HTML，比较两个拉取时间戳；变了才重载，避免无意义闪烁。
+   GitHub Pages 对 HTML 有约 10 分钟 CDN 缓存，所以必须带 ?_= 时间戳绕过。 */
+const REFRESH_CHECK_MS = 5 * 60 * 1000;
+async function checkForUpdate(){
+  if (document.visibilityState !== 'visible') return;
+  try {
+    const res = await fetch(location.pathname + '?_=' + Date.now(), {cache: 'no-store'});
+    if (!res.ok) return;
+    const html = await res.text();
+    const grab = (name) => {
+      const m = html.match(new RegExp('const ' + name + ' = new Date\\((\\d+)\\)'));
+      return m ? m[1] : null;
+    };
+    const p = grab('PULLED'), tr = grab('TRENGO_PULLED');
+    if ((p && p !== String(PULLED.getTime())) || (tr && tr !== String(TRENGO_PULLED.getTime()))) {
+      location.replace(location.pathname + '?r=' + Date.now());
+    }
+  } catch (e) { /* 离线或请求失败：下一轮再试，不打扰用户 */ }
+}
+setInterval(checkForUpdate, REFRESH_CHECK_MS);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') checkForUpdate();
+});
 
 const REG = regions[0];
 function sum(map, keys){ return keys.reduce((s,k)=> s + (map[REG+'|'+k]||0), 0); }
@@ -681,7 +707,7 @@ function render(){
   }
 
   // ---- 页脚 ----
-  document.getElementById('footNote').innerHTML = t('foot');
+  document.getElementById('footNote').innerHTML = t('foot') + '　' + t('autoRefresh');
 
   // ---- 语言按钮状态 ----
   document.querySelectorAll('#langSwitch button').forEach(b=>{
