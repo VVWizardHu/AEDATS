@@ -317,27 +317,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(0);
+const PULLED = new Date(1789569691378);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
-const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
-const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
-const weekStart = new Date(0);
-const trengoNew = 0;            // DA WA 新单待分派
-const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 0;       // DA WA 处理中
-const trengoClosedThis = 0;     // DA WA 本周已处理
-const trengoClosedLast = 0;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(0);
+const stock = {"德语区(DE/AT)|L1":2532,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":83,"德语区(DE/AT)|L4":26};
+const noAction = {"德语区(DE/AT)|L1":431,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
+const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":432,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":155,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
+const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
+const closedThis = {"德语区(DE/AT)|L1":183,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
+const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":299,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
+const ageAll = {"德语区(DE/AT)|>3m":325,"德语区(DE/AT)|1-3m":956,"德语区(DE/AT)|<1m":1427};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":231,"德语区(DE/AT)|<1m":978};
+const weekStart = new Date(1789336800000);
+const trengoNew = 1;            // DA WA 新单待分派
+const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 25;       // DA WA 处理中
+const trengoClosedThis = 134;     // DA WA 本周已处理
+const trengoClosedLast = 254;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(1789569691378);
 
 /* ========== 双语词典 ========== */
 const I18N = {
