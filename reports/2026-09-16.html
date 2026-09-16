@@ -120,6 +120,17 @@
   .two-col .card .note{margin-top:auto;}
   @media (max-width:820px){.two-col{grid-template-columns:1fr;}}
 
+  /* ---- Trengo / DA WA ---- */
+  .tre-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .tre-cell{border:1px solid var(--hair);background:var(--panel);padding:14px 16px;border-top:4px solid var(--amber);}
+  .tre-cell.k-work{border-top-color:var(--blue);}
+  .tre-cell.k-done{border-top-color:var(--teal);}
+  .tre-cell .tre-name{font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;}
+  .tre-cell .tre-val{font-size:30px;font-weight:600;line-height:1.15;margin-top:6px;}
+  .tre-cell .tre-sub{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+  .tre-cell .tre-sub b{font-family:'IBM Plex Mono',monospace;color:var(--ink);}
+  @media (max-width:820px){.tre-grid{grid-template-columns:1fr;}}
+
   /* ---- Hotline ---- */
   .q-row{display:grid;grid-template-columns:132px 1fr 244px;align-items:center;gap:12px;margin-bottom:7px;}
   .q-row .q-name{font-size:12px;font-weight:600;}
@@ -193,6 +204,12 @@
   </div>
 
   <div class="card">
+    <h2 id="trengoTitle"></h2>
+    <div class="sub" id="trengoSub"></div>
+    <div class="tre-grid" id="treGrid"></div>
+  </div>
+
+  <div class="card">
     <h2 id="hotlineTitle"></h2>
     <div class="sub" id="hotlineSub"></div>
     <div class="legend" id="hotlineLegend"></div>
@@ -205,21 +222,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789563609984);
+const PULLED = new Date(1789566076233);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2542,"德语区(DE/AT)|L2":68,"德语区(DE/AT)|L3":96,"德语区(DE/AT)|L4":24};
+const stock = {"德语区(DE/AT)|L1":2537,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":88,"德语区(DE/AT)|L4":24};
 const noAction = {"德语区(DE/AT)|L1":434,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":549,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":420,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":150,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":9};
+const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":428,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":151,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":9};
 const newLast = {"德语区(DE/AT)|L1":394,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":3};
-const closedThis = {"德语区(DE/AT)|L1":169,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
+const closedThis = {"德语区(DE/AT)|L1":174,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":291,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
-const ageAll = {"德语区(DE/AT)|>3m":328,"德语区(DE/AT)|1-3m":961,"德语区(DE/AT)|<1m":1441};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":234,"德语区(DE/AT)|<1m":998};
+const woStock = {"德语区(DE/AT)|发货":297,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":81};
+const ageAll = {"德语区(DE/AT)|>3m":328,"德语区(DE/AT)|1-3m":961,"德语区(DE/AT)|<1m":1427};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":234,"德语区(DE/AT)|<1m":993};
 const weekStart = new Date(1789336800000);
+const trengoNew = 0;            // DA WA 新单待分派
+const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 25;       // DA WA 处理中
+const trengoClosedThis = 133;     // DA WA 本周已处理
+const trengoClosedLast = 254;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(1789566076233);
 
 /* ========== 双语词典 ========== */
 const I18N = {
@@ -249,6 +272,11 @@ const I18N = {
     woNote:'已转上门工单 <b>{n}</b> 条单独统计，不计入 Ticket 存量',
     hotlineTitle:'Hotline 情况',
     hotlineSub:'数据来源 Genesys Cloud（voice queue）　·　条形＝各队列来电构成（按占比填满整行）',
+    treTitle:'Trengo · DA WA（WhatsApp 客服）',
+    treSub:'渠道「DA WA (+49 1522 3112326)」　·　数据来源 Trengo　·　拉取时间 {t}',
+    treWait:'新单待分派', treWaitSub:'未关闭且尚未分配处理人',
+    treWorking:'处理中', treWorkingSub:'已分配给客服，尚未关闭',
+    treDone:'本周已处理', treDoneSub:'上周 <b>{p}</b> · 环比 {d}',
     legAns:'接起', legAb:'放弃', legRest:'其他未接', legOther:'其他未接',
     qCalls:'来电', qRate:'接起率', qAbandon:'放弃率', qTotal:'合计',
     foot:'Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）',
@@ -280,6 +308,11 @@ const I18N = {
     woNote:'<b>{n}</b> an Onsite-Tickets übergeben (separat gezählt, nicht im Ticket-Bestand)',
     hotlineTitle:'Hotline-Übersicht',
     hotlineSub:'Quelle: Genesys Cloud (Voice Queue)　|　Balken = Zusammensetzung der Anrufe je Queue',
+    treTitle:'Trengo · DA WA (WhatsApp-Support)',
+    treSub:'Kanal „DA WA (+49 1522 3112326)"　·　Quelle: Trengo　·　Abgerufen {t}',
+    treWait:'Neu, nicht zugewiesen', treWaitSub:'offen und noch keinem Bearbeiter zugewiesen',
+    treWorking:'In Bearbeitung', treWorkingSub:'einem Agenten zugewiesen, noch nicht geschlossen',
+    treDone:'Diese Woche erledigt', treDoneSub:'Vorwoche <b>{p}</b> · Δ {d}',
     legAns:'angenommen', legAb:'abgebrochen', legRest:'sonst. verpasst', legOther:'sonst. verpasst',
     qCalls:'Anrufe', qRate:'Annahmequote', qAbandon:'Abbruchquote', qTotal:'Gesamt',
     foot:'Ticket-Kriterien: alp_casegrade / alp_casestatus　·　Work-Order-Kriterien: alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>Region: nur deutschsprachiger Raum (DE/AT); Bestand = Created + In Progress(Service) (ohne an Onsite-Tickets übergebene Fälle)',
@@ -443,6 +476,32 @@ function render(){
   document.getElementById('woSub').textContent = t('woSub');
   document.getElementById('woTable').innerHTML = wRows;
   document.getElementById('woNote').innerHTML = t('woNote', {n: fmt(onsiteTot)});
+
+  // ---- Trengo · DA WA ----
+  const treDT = TRENGO_PULLED.getTime()
+    ? TRENGO_PULLED.toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN',
+        {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+    : '—';
+  document.getElementById('trengoTitle').textContent = t('treTitle');
+  document.getElementById('trengoSub').textContent = t('treSub', {t: treDT});
+  const treDelta = trengoClosedThis - trengoClosedLast;
+  document.getElementById('treGrid').innerHTML = `
+    <div class="tre-cell">
+      <div class="tre-name">${t('treWait')}</div>
+      <div class="tre-val num">${fmt(trengoNew)}</div>
+      <div class="tre-sub">${t('treWaitSub')}</div>
+    </div>
+    <div class="tre-cell k-work">
+      <div class="tre-name">${t('treWorking')}</div>
+      <div class="tre-val num">${fmt(trengoAssigned)}</div>
+      <div class="tre-sub">${t('treWorkingSub')}</div>
+    </div>
+    <div class="tre-cell k-done">
+      <div class="tre-name">${t('treDone')}</div>
+      <div class="tre-val num">${fmt(trengoClosedThis)}</div>
+      <div class="tre-sub">${t('treDoneSub', {p: fmt(trengoClosedLast),
+        d: (treDelta > 0 ? '+' : '') + fmt(treDelta)})}</div>
+    </div>`;
 
   // ---- Hotline ----
   document.getElementById('hotlineTitle').textContent = t('hotlineTitle');
