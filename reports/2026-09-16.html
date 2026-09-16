@@ -16,25 +16,27 @@
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}
   .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
-  .wrap{max-width:1120px;margin:0 auto;padding:36px 28px 64px;}
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 24px 40px;}
 
   header{display:flex;justify-content:space-between;align-items:flex-end;
-    border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:22px;}
+    border-bottom:2px solid var(--ink);padding-bottom:13px;margin-bottom:16px;}
   header h1{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:28px;margin:0;letter-spacing:.2px;}
   header .period{font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
   header .pulled{text-align:right;font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;}
   header .pulled .num{font-size:14px;color:var(--ink);display:block;margin-top:3px;letter-spacing:0;text-transform:none;}
 
   /* ---- KPI 卡 ---- */
-  .kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:30px;}
+  .kpi-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:22px;}
+  @media (max-width:1080px){.kpi-strip{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  @media (max-width:620px){.kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr));}}
   .kpi{background:var(--card);border:1px solid var(--hair);border-top:3px solid var(--teal);
-    padding:14px 16px 15px;position:relative;}
+    padding:12px 13px 13px;position:relative;}
   .kpi.warn{border-top-color:var(--amber);}
   .kpi.risk{border-top-color:var(--rust);}
   .kpi.muted{border-top-color:var(--ink-soft);}
-  .kpi .k-label{font-size:11px;color:var(--ink-soft);letter-spacing:.5px;text-transform:uppercase;}
-  .kpi .k-val{font-size:30px;font-weight:600;line-height:1.15;margin-top:6px;}
-  .kpi .k-sub{font-size:11.5px;color:var(--ink-soft);margin-top:5px;}
+  .kpi .k-label{font-size:10.5px;color:var(--ink-soft);letter-spacing:.3px;text-transform:uppercase;line-height:1.35;}
+  .kpi .k-val{font-size:26px;font-weight:600;line-height:1.15;margin-top:5px;}
+  .kpi .k-sub{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.4;}
   /* 重点指标高亮 */
   .kpi.emph{border-top-width:4px;border-top-color:var(--rust);
     background:linear-gradient(180deg,var(--rust-soft) 0%,var(--card) 62%);}
@@ -46,12 +48,12 @@
   tr.hot td{background:var(--amber-soft);font-weight:600;}
   tr.hot td:first-child{border-left:3px solid var(--amber);padding-left:9px;}
 
-  .card{background:var(--card);border:1px solid var(--hair);padding:20px 22px 22px;margin-bottom:20px;}
-  .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:17px;margin:0 0 3px;}
-  .card .sub{font-size:12px;color:var(--ink-soft);margin-bottom:16px;}
+  .card{background:var(--card);border:1px solid var(--hair);padding:16px 18px 17px;margin-bottom:14px;}
+  .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:16.5px;margin:0 0 2px;}
+  .card .sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;}
 
   /* ---- 分层：堆叠占比条 + 数字块 ---- */
-  .stack{display:flex;height:26px;border:1px solid var(--hair);overflow:hidden;margin-bottom:16px;}
+  .stack{display:flex;height:24px;border:1px solid var(--hair);overflow:hidden;margin-bottom:12px;}
   .stack .seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
     color:#fff;min-width:2px;white-space:nowrap;overflow:hidden;}
   .stack .seg.s1{background:var(--teal);}
@@ -97,32 +99,40 @@
   th{text-align:right;font-weight:600;font-size:10.5px;color:var(--ink-soft);letter-spacing:.4px;
     text-transform:uppercase;border-bottom:1px solid var(--ink);padding:0 0 7px;}
   th:first-child{text-align:left;}
-  td{text-align:right;padding:9px 0;border-bottom:1px solid var(--hair);}
+  td{text-align:right;padding:7px 0;border-bottom:1px solid var(--hair);}
   td:first-child{text-align:left;font-weight:500;}
   tr.total td{border-top:1px solid var(--ink);border-bottom:none;font-weight:600;}
   .up{color:var(--rust);} .down{color:var(--moss);} .flat{color:var(--ink-soft);}
   .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;background:var(--teal-soft);color:var(--teal);}
+  .note{font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--hair);padding-top:8px;margin-top:9px;line-height:1.5;}
 
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
+  .two-col .card{margin-bottom:14px;display:flex;flex-direction:column;}
+  .two-col .card .tbl-fill{margin-top:auto;}
   @media (max-width:820px){.two-col{grid-template-columns:1fr;}}
 
   /* ---- Hotline ---- */
-  .q-row{display:grid;grid-template-columns:126px 1fr 236px;align-items:center;gap:14px;margin-bottom:9px;}
+  .q-row{display:grid;grid-template-columns:132px 1fr 244px;align-items:center;gap:12px;margin-bottom:7px;}
   .q-row .q-name{font-size:12px;font-weight:600;}
-  .q-bar{display:flex;height:20px;border:1px solid var(--hair);overflow:hidden;}
+  .q-bar{display:flex;height:19px;border:1px solid var(--hair);overflow:hidden;}
   .q-bar .seg{min-width:1px;}
   .q-bar .answered{background:var(--teal);}
   .q-bar .abandoned{background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 4px,var(--amber-soft) 4px,var(--amber-soft) 8px);}
   .q-bar .rest{background:#E6E9E7;}
-  .q-stats{font-size:12px;color:var(--ink-soft);}
+  .q-stats{font-size:11.5px;color:var(--ink-soft);display:flex;align-items:baseline;gap:10px;justify-content:flex-end;}
   .q-stats b{color:var(--ink);font-family:'IBM Plex Mono',monospace;}
-  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;}
+  /* 接起率重点显示 */
+  .q-stats .rate{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .q-stats .rate b{font-size:16px;font-weight:700;color:var(--teal);letter-spacing:-.4px;}
+  .q-stats .rate.low b{color:var(--rust);}
+  .q-stats .rate.mid b{color:var(--amber);}
+  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;}
   .legend i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--hair);}
   .legend .l-ans{background:var(--teal);}
   .legend .l-ab{background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 3px,var(--amber-soft) 3px,var(--amber-soft) 6px);}
   .legend .l-rest{background:#E6E9E7;}
 
-  footer{border-top:1px solid var(--hair);padding-top:14px;margin-top:26px;font-size:11.5px;color:var(--ink-soft);line-height:1.7;}
+  footer{border-top:1px solid var(--hair);padding-top:12px;margin-top:18px;font-size:11.5px;color:var(--ink-soft);line-height:1.65;}
 </style>
 </head>
 <body>
@@ -156,12 +166,14 @@
     <div class="card">
       <h2>本周新增 / 关闭</h2>
       <div class="sub">环比 = 与上周整周比较（红＝恶化，绿＝改善）</div>
-      <table id="deltaTable"></table>
+      <div class="tbl-fill"><table id="deltaTable"></table></div>
+      <div class="note">关闭口径：alp_closedstatusupdatedon；本周＝本周一 00:00 起</div>
     </div>
     <div class="card">
       <h2>Work Order 存量 · 分类型</h2>
       <div class="sub">未完成工单，剔除已发货(Shipped)</div>
-      <table id="woTable"></table>
+      <div class="tbl-fill"><table id="woTable"></table></div>
+      <div class="note">已转上门工单单独列出，不计入 Ticket 存量</div>
     </div>
   </div>
 
@@ -183,22 +195,22 @@
 </div>
 
 <script>
-const PULLED = new Date(1789552569998);
+const PULLED = new Date(1789553032014);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
-const types = ['发货','内部上门','服务商上门'];
+const types = ['内部上门','服务商上门','发货'];
 
-const stock = {"德语区(DE/AT)|L1":2549,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":100,"德语区(DE/AT)|L4":11};
+const stock = {"德语区(DE/AT)|L1":2545,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":101,"德语区(DE/AT)|L4":14};
 const noAction = {"德语区(DE/AT)|L1":437,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
 const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":416,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":142,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":1};
-const newLast = {"德语区(DE/AT)|L1":396,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":1};
+const newThis = {"德语区(DE/AT)|L1":141,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":2};
+const newLast = {"德语区(DE/AT)|L1":395,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":2};
 const closedThis = {"德语区(DE/AT)|L1":160,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":9,"德语区(DE/AT)|L4":1};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":291,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
+const woStock = {"德语区(DE/AT)|发货":290,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
 const ageAll = {"德语区(DE/AT)|>3m":327,"德语区(DE/AT)|1-3m":967,"德语区(DE/AT)|<1m":1433};
 const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":240,"德语区(DE/AT)|<1m":1001};
 
@@ -323,8 +335,8 @@ document.getElementById('woTable').innerHTML = wRows;
 const hotlineQueues = {
   "德语区(DE/AT)": [
     {name:"GER-On-Site", offer:6, answer:4, abandon:2},
-    {name:"GER_End_User", offer:133, answer:10, abandon:58},
     {name:"GER_Installer", offer:4, answer:4, abandon:0},
+    {name:"GER_End_User", offer:133, answer:10, abandon:58},
   ],
 };
 const hb = document.getElementById('hotlineBars');
@@ -349,18 +361,29 @@ if(!queues){
   queues.forEach(q=>{
     const aPct = q.offer ? q.answer / q.offer * 100 : 0;
     const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
+    const rCls = aPct < 50 ? 'low' : (aPct < 80 ? 'mid' : '');
     rows += `
       <div class="q-row">
         <div class="q-name">${q.name}</div>
         ${bar(q)}
-        <div class="q-stats">来电 <b>${q.offer}</b>　接起率 <b>${aPct.toFixed(0)}%</b>　放弃率 <b class="${abPct>=30?'up':''}">${abPct.toFixed(0)}%</b></div>
+        <div class="q-stats">
+          <span>来电 <b>${q.offer}</b></span>
+          <span class="rate ${rCls}">接起率 <b>${aPct.toFixed(0)}%</b></span>
+          <span>放弃率 <b class="${abPct>=30?'up':''}">${abPct.toFixed(0)}%</b></span>
+        </div>
       </div>`;
   });
+  const tAPct = tOffer ? tAns/tOffer*100 : 0;
+  const tAbPct = tOffer ? tAb/tOffer*100 : 0;
   rows += `
-    <div class="q-row" style="margin-top:12px;border-top:1px solid var(--ink);padding-top:10px;">
+    <div class="q-row" style="margin-top:10px;border-top:1px solid var(--ink);padding-top:9px;">
       <div class="q-name">合计</div>
       ${bar({offer:tOffer, answer:tAns, abandon:tAb})}
-      <div class="q-stats">来电 <b>${tOffer}</b>　接起率 <b>${(tAns/tOffer*100).toFixed(1)}%</b>　放弃率 <b>${(tAb/tOffer*100).toFixed(1)}%</b></div>
+      <div class="q-stats">
+        <span>来电 <b>${tOffer}</b></span>
+        <span class="rate ${tAPct<50?'low':(tAPct<80?'mid':'')}">接起率 <b>${tAPct.toFixed(1)}%</b></span>
+        <span>放弃率 <b class="${tAbPct>=30?'up':''}">${tAbPct.toFixed(1)}%</b></span>
+      </div>
     </div>`;
   hb.innerHTML = rows;
 }
