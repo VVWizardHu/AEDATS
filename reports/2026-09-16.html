@@ -17,7 +17,7 @@
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}
   .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
-  .wrap{max-width:1120px;margin:0 auto;padding:26px 24px 40px;}
+  .wrap{max-width:1720px;margin:0 auto;padding:18px 24px 26px;}
 
   header{display:flex;justify-content:space-between;align-items:flex-end;
     border-bottom:2px solid var(--ink);padding-bottom:13px;margin-bottom:16px;}
@@ -56,6 +56,43 @@
   .kpi .badge.sand{background:var(--amber);}
   tr.hot td{background:var(--amber-soft);font-weight:600;}
   tr.hot td:first-child{border-left:3px solid var(--amber);padding-left:9px;}
+
+  /* ---- 宽屏仪表盘：左右双栏，一屏装下 ---- */
+  .dash{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:14px;align-items:start;}
+  .col-main,.col-side{display:flex;flex-direction:column;gap:14px;min-width:0;}
+  .dash .card{margin-bottom:0;}
+  .dash .two-col{gap:14px;margin:0;}
+  @media (max-width:1180px){
+    .dash{grid-template-columns:1fr;}
+    .col-side{order:-1;}          /* 窄屏时 Trengo / Hotline 仍在 Ticket 明细之前 */
+  }
+  /* 显示器高度不够时整体收紧，尽量一屏 */
+  @media (max-height:960px){
+    .wrap{padding:12px 18px 16px;}
+    header{padding-bottom:9px;margin-bottom:11px;}
+    header h1{font-size:23px;}
+    header .period{font-size:12.5px;margin-top:4px;}
+    .kpi-strip{margin-bottom:12px;gap:9px;}
+    .kpi{padding:10px 12px 11px;}
+    .kpi .k-val{font-size:24px;}
+    .kpi .k-label,.kpi .k-sub{font-size:10px;}
+    .card{padding:12px 14px 13px;}
+    .card h2{font-size:15px;}
+    .card .sub{font-size:11px;margin-bottom:8px;}
+    .stack{height:19px;margin-bottom:8px;}
+    .tier-cell,.age-cell,.tre-cell{padding:9px 11px;}
+    .tier-cell .t-val,.age-cell .a-val,.tre-cell .tre-val{font-size:21px;margin-top:2px;}
+    .age-cell.hot .a-val{font-size:24px;}
+    .tier-cell .t-na,.tier-cell .t-share,.age-cell .a-share,.age-cell .a-new,.tre-cell .tre-sub{font-size:10.5px;margin-top:2px;}
+    .age-cell .a-new{padding-top:6px;margin-top:7px;}
+    td{padding:5px 0;}
+    th{padding-bottom:5px;}
+    .q-row{margin-bottom:5px;}
+    .q-bar{height:16px;}
+    .q-stats .rate b{font-size:14px;}
+    .tre-cell .tre-val{font-size:24px;}
+    footer{padding-top:8px;margin-top:10px;font-size:11px;}
+  }
 
   .card{background:var(--card);border:1px solid var(--hair);padding:16px 18px 17px;margin-bottom:14px;}
   .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:16.5px;margin:0 0 2px;}
@@ -174,45 +211,47 @@
 
   <div class="kpi-strip" id="kpiRow"></div>
 
-  <div class="card">
-    <h2 id="trengoTitle"></h2>
-    <div class="sub" id="trengoSub"></div>
-    <div class="tre-grid" id="treGrid"></div>
-  </div>
-
-  <div class="card">
-    <h2 id="hotlineTitle"></h2>
-    <div class="sub" id="hotlineSub"></div>
-    <div class="legend" id="hotlineLegend"></div>
-    <div id="hotlineBars"></div>
-  </div>
-
-  <div class="card">
-    <h2 id="tierTitle"></h2>
-    <div class="sub" id="tierSub"></div>
-    <div class="stack" id="tierStack"></div>
-    <div class="tier-grid" id="tierGrid"></div>
-  </div>
-
-  <div class="card">
-    <h2 id="ageTitle"></h2>
-    <div class="sub" id="ageSub"></div>
-    <div class="stack" id="ageStackAll"></div>
-    <div class="age-grid" id="ageGrid"></div>
-  </div>
-
-  <div class="two-col">
-    <div class="card">
-      <h2 id="deltaTitle"></h2>
-      <div class="sub" id="deltaSub"></div>
-      <div class="tbl-fill"><table id="deltaTable"></table></div>
-      <div class="note" id="deltaNote"></div>
+  <div class="dash">
+    <div class="col-main">
+        <div class="card">
+          <h2 id="tierTitle"></h2>
+          <div class="sub" id="tierSub"></div>
+          <div class="stack" id="tierStack"></div>
+          <div class="tier-grid" id="tierGrid"></div>
+        </div>
+        <div class="card">
+          <h2 id="ageTitle"></h2>
+          <div class="sub" id="ageSub"></div>
+          <div class="stack" id="ageStackAll"></div>
+          <div class="age-grid" id="ageGrid"></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <h2 id="deltaTitle"></h2>
+            <div class="sub" id="deltaSub"></div>
+            <div class="tbl-fill"><table id="deltaTable"></table></div>
+            <div class="note" id="deltaNote"></div>
+          </div>
+          <div class="card">
+            <h2 id="woTitle"></h2>
+            <div class="sub" id="woSub"></div>
+            <div class="tbl-fill"><table id="woTable"></table></div>
+            <div class="note" id="woNote"></div>
+          </div>
+        </div>
     </div>
-    <div class="card">
-      <h2 id="woTitle"></h2>
-      <div class="sub" id="woSub"></div>
-      <div class="tbl-fill"><table id="woTable"></table></div>
-      <div class="note" id="woNote"></div>
+    <div class="col-side">
+        <div class="card">
+          <h2 id="trengoTitle"></h2>
+          <div class="sub" id="trengoSub"></div>
+          <div class="tre-grid" id="treGrid"></div>
+        </div>
+        <div class="card">
+          <h2 id="hotlineTitle"></h2>
+          <div class="sub" id="hotlineSub"></div>
+          <div class="legend" id="hotlineLegend"></div>
+          <div id="hotlineBars"></div>
+        </div>
     </div>
   </div>
 
@@ -222,27 +261,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789567218684);
+const PULLED = new Date(1789567410436);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2535,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":88,"德语区(DE/AT)|L4":25};
+const stock = {"德语区(DE/AT)|L1":2534,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":88,"德语区(DE/AT)|L4":26};
 const noAction = {"德语区(DE/AT)|L1":434,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
 const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":428,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":152,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
-const newLast = {"德语区(DE/AT)|L1":394,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":3};
-const closedThis = {"德语区(DE/AT)|L1":177,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
+const newThis = {"德语区(DE/AT)|L1":153,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
+const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
+const closedThis = {"德语区(DE/AT)|L1":178,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
 const woStock = {"德语区(DE/AT)|发货":297,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":81};
 const ageAll = {"德语区(DE/AT)|>3m":328,"德语区(DE/AT)|1-3m":961,"德语区(DE/AT)|<1m":1426};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":234,"德语区(DE/AT)|<1m":985};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":234,"德语区(DE/AT)|<1m":984};
 const weekStart = new Date(1789336800000);
 const trengoNew = 1;            // DA WA 新单待分派
 const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
 const trengoAssigned = 25;       // DA WA 处理中
 const trengoClosedThis = 133;     // DA WA 本周已处理
 const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789567218684);
+const TRENGO_PULLED = new Date(1789567410436);
 
 /* ========== 双语词典 ========== */
 const I18N = {
