@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DA 技术服务日常看板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,8 +23,16 @@
     border-bottom:2px solid var(--ink);padding-bottom:13px;margin-bottom:16px;}
   header h1{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:28px;margin:0;letter-spacing:.2px;}
   header .period{font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
+  .hright{display:flex;flex-direction:column;align-items:flex-end;gap:9px;}
   header .pulled{text-align:right;font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;}
   header .pulled .num{font-size:14px;color:var(--ink);display:block;margin-top:3px;letter-spacing:0;text-transform:none;}
+  /* 语言切换 */
+  .lang{display:inline-flex;border:1px solid var(--hair);background:var(--panel);border-radius:3px;overflow:hidden;}
+  .lang button{font:inherit;font-size:11.5px;line-height:1;padding:6px 12px;border:0;background:transparent;
+    color:var(--ink-soft);cursor:pointer;letter-spacing:.3px;}
+  .lang button + button{border-left:1px solid var(--hair);}
+  .lang button:hover{background:var(--teal-soft);color:var(--teal);}
+  .lang button.on{background:var(--teal);color:#fff;font-weight:600;}
 
   /* ---- KPI 卡 ---- */
   .kpi-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:22px;}
@@ -140,23 +149,29 @@
 
   <header>
     <div>
-      <h1>DA 技术服务日常看板</h1>
-      <div class="period">周期 2026-09-14 ~ 09-20　·　数据来源 D365 CRM</div>
+      <h1 id="pageH1"></h1>
+      <div class="period" id="periodLine"></div>
     </div>
-    <div class="pulled">拉取时间<span class="num" id="pulledTime"></span></div>
+    <div class="hright">
+      <div class="lang" id="langSwitch">
+        <button type="button" data-lang="zh">中文</button>
+        <button type="button" data-lang="de">Deutsch</button>
+      </div>
+      <div class="pulled"><span id="pulledLabel"></span><span class="num" id="pulledTime"></span></div>
+    </div>
   </header>
 
   <div class="kpi-strip" id="kpiRow"></div>
 
   <div class="card">
-    <h2>Ticket 存量 · 分层级</h2>
+    <h2 id="tierTitle"></h2>
     <div class="sub" id="tierSub"></div>
     <div class="stack" id="tierStack"></div>
     <div class="tier-grid" id="tierGrid"></div>
   </div>
 
   <div class="card">
-    <h2>客诉账龄 · 未关闭 / 新建未处理</h2>
+    <h2 id="ageTitle"></h2>
     <div class="sub" id="ageSub"></div>
     <div class="stack" id="ageStackAll"></div>
     <div class="age-grid" id="ageGrid"></div>
@@ -164,177 +179,131 @@
 
   <div class="two-col">
     <div class="card">
-      <h2>本周新增 / 关闭</h2>
-      <div class="sub">环比 = 与上周整周比较（红＝恶化，绿＝改善）</div>
+      <h2 id="deltaTitle"></h2>
+      <div class="sub" id="deltaSub"></div>
       <div class="tbl-fill"><table id="deltaTable"></table></div>
-      <div class="note">关闭口径：alp_closedstatusupdatedon；本周＝本周一 00:00 起</div>
+      <div class="note" id="deltaNote"></div>
     </div>
     <div class="card">
-      <h2>Work Order 存量 · 分类型</h2>
-      <div class="sub">未完成工单，剔除已发货(Shipped)</div>
+      <h2 id="woTitle"></h2>
+      <div class="sub" id="woSub"></div>
       <div class="tbl-fill"><table id="woTable"></table></div>
       <div class="note" id="woNote"></div>
     </div>
   </div>
 
   <div class="card">
-    <h2>Hotline 情况</h2>
-    <div class="sub">数据来源 Genesys Cloud（voice queue）　·　条形＝各队列来电构成（按占比填满整行）</div>
-    <div class="legend">
-      <span><i class="l-ans"></i>接起</span>
-      <span><i class="l-ab"></i>放弃</span>
-      <span><i class="l-rest"></i>其他未接</span>
-    </div>
+    <h2 id="hotlineTitle"></h2>
+    <div class="sub" id="hotlineSub"></div>
+    <div class="legend" id="hotlineLegend"></div>
     <div id="hotlineBars"></div>
   </div>
 
-  <footer>
-    Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>
-    地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）</footer>
+  <footer id="footNote"></footer>
 
 </div>
 
 <script>
-const PULLED = new Date(1789560001202);
-document.getElementById('pulledTime').textContent =
-  PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-
+/* ========== 数据块（脚本自动替换，勿手改） ========== */
+const PULLED = new Date(0);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
+const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
+const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const weekStart = new Date(0);
 
-const stock = {"德语区(DE/AT)|L1":2543,"德语区(DE/AT)|L2":68,"德语区(DE/AT)|L3":100,"德语区(DE/AT)|L4":21};
-const noAction = {"德语区(DE/AT)|L1":436,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":549,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":416,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":144,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":7};
-const newLast = {"德语区(DE/AT)|L1":395,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":2};
-const closedThis = {"德语区(DE/AT)|L1":163,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":290,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
-const ageAll = {"德语区(DE/AT)|>3m":328,"德语区(DE/AT)|1-3m":964,"德语区(DE/AT)|<1m":1440};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":237,"德语区(DE/AT)|<1m":1001};
+/* ========== 双语词典 ========== */
+const I18N = {
+  zh: {
+    pageTitle:'DA 技术服务日常看板',
+    period:'周期 {p}　·　数据来源 D365 CRM',
+    pulled:'拉取时间',
+    kStock:'Ticket 存量', kStockSub:'未关闭待处理客诉',
+    kOld:'超 3 个月未关闭', kOldSub:'占存量 {s} · 优先清理', bOld:'积压',
+    kNa:'无动作', kNaSub:'{n} 条 · 5 个工作日无更新',
+    kNew:'本周新增', kNewSub:'上周 {p} · 环比 {d}',
+    kClosed:'本周关闭', kClosedSub:'上周 {p} · 环比 {d}',
+    kWO:'WO 内部上门', kWOSub:'自有团队上门工单存量', bOwn:'自有团队',
+    tierTitle:'Ticket 存量 · 分层级',
+    tierSub:'合计 {tot} · 其中无动作 {na}（{pct}%）　｜　占比条 = 各层级构成',
+    tierShare:'占 DA 存量 {s}', tierNa:'无动作',
+    ageTitle:'客诉账龄 · 未关闭 / 新建未处理',
+    ageSub:'未关闭合计 {tot}（按创建时间分档）；其中「新建未处理」(状态=Created) {nw} 条',
+    ageL1:'超过 3 个月', ageL2:'1 – 3 个月', ageL3:'1 个月以内',
+    ageFlag:'优先清理', ageShare:'占未关闭 {s}', ageNew:'新建未处理', ageOf:'占本档 {s}',
+    deltaTitle:'本周新增 / 关闭', deltaSub:'环比 = 与上周整周比较（红＝恶化，绿＝改善）',
+    deltaNote:'关闭口径：alp_closedstatusupdatedon；本周＝本周一 00:00 起',
+    thMetric:'指标', thThis:'本周', thLast:'上周', thDelta:'环比',
+    rowNew:'新增 Ticket', rowClosed:'关闭 Ticket', rowNet:'净变化',
+    woTitle:'Work Order 存量 · 分类型', woSub:'未完成工单，剔除已发货(Shipped)',
+    woOwn:'自有团队', woTotal:'合计',
+    woNote:'已转上门工单 <b>{n}</b> 条单独统计，不计入 Ticket 存量',
+    hotlineTitle:'Hotline 情况',
+    hotlineSub:'数据来源 Genesys Cloud（voice queue）　·　条形＝各队列来电构成（按占比填满整行）',
+    legAns:'接起', legAb:'放弃', legRest:'其他未接', legOther:'其他未接',
+    qCalls:'来电', qRate:'接起率', qAbandon:'放弃率', qTotal:'合计',
+    foot:'Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）',
+    woTypeInternal:'内部上门', woTypeProvider:'服务商上门', woTypeShipping:'发货',
+  },
+  de: {
+    pageTitle:'DA Technischer Service – Tagesübersicht',
+    period:'Zeitraum {p}　·　Datenquelle: D365 CRM',
+    pulled:'Abgerufen',
+    kStock:'Ticket-Bestand', kStockSub:'Offene, unbearbeitete Fälle',
+    kOld:'Offen über 3 Monate', kOldSub:'{s} des Bestands · vorrangig bearbeiten', bOld:'Rückstand',
+    kNa:'Ohne Aktivität', kNaSub:'{n} Fälle · 5 Werktage ohne Update',
+    kNew:'Neu diese Woche', kNewSub:'Vorwoche {p} · Δ {d}',
+    kClosed:'Geschlossen diese Woche', kClosedSub:'Vorwoche {p} · Δ {d}',
+    kWO:'WO Innen-Onsite', kWOSub:'Offene Onsite-Aufträge des eigenen Teams', bOwn:'Eigenes Team',
+    tierTitle:'Ticket-Bestand · nach Ebene',
+    tierSub:'Gesamt {tot} · davon ohne Aktivität {na} ({pct} %)　|　Balken = Zusammensetzung nach Ebene',
+    tierShare:'Anteil am DA-Bestand {s}', tierNa:'ohne Aktivität',
+    ageTitle:'Fallalter · offen / neu & unbearbeitet',
+    ageSub:'Offen gesamt {tot} (nach Erstellungsdatum); davon „neu & unbearbeitet" (Status = Created) {nw}',
+    ageL1:'über 3 Monate', ageL2:'1 – 3 Monate', ageL3:'bis 1 Monat',
+    ageFlag:'priorisieren', ageShare:'{s} der offenen', ageNew:'neu & unbearbeitet', ageOf:'{s} der Gruppe',
+    deltaTitle:'Neu / Geschlossen diese Woche', deltaSub:'Δ = Vergleich mit der ganzen Vorwoche (rot = schlechter, grün = besser)',
+    deltaNote:'Schließdatum: alp_closedstatusupdatedon; Woche ab Montag 00:00',
+    thMetric:'Kennzahl', thThis:'Diese Woche', thLast:'Vorwoche', thDelta:'Δ',
+    rowNew:'Neue Tickets', rowClosed:'Geschlossene Tickets', rowNet:'Nettoveränderung',
+    woTitle:'Work-Order-Bestand · nach Typ', woSub:'Offene Aufträge, ohne versandte (Shipped)',
+    woOwn:'eigenes Team', woTotal:'Gesamt',
+    woNote:'<b>{n}</b> an Onsite-Tickets übergeben (separat gezählt, nicht im Ticket-Bestand)',
+    hotlineTitle:'Hotline-Übersicht',
+    hotlineSub:'Quelle: Genesys Cloud (Voice Queue)　|　Balken = Zusammensetzung der Anrufe je Queue',
+    legAns:'angenommen', legAb:'abgebrochen', legRest:'sonst. verpasst', legOther:'sonst. verpasst',
+    qCalls:'Anrufe', qRate:'Annahmequote', qAbandon:'Abbruchquote', qTotal:'Gesamt',
+    foot:'Ticket-Kriterien: alp_casegrade / alp_casestatus　·　Work-Order-Kriterien: alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>Region: nur deutschsprachiger Raum (DE/AT); Bestand = Created + In Progress(Service) (ohne an Onsite-Tickets übergebene Fälle)',
+    woTypeInternal:'Innen-Onsite', woTypeProvider:'Dienstleister-Onsite', woTypeShipping:'Versand',
+  }
+};
+const WO_TYPE_KEY = {'内部上门':'woTypeInternal','服务商上门':'woTypeProvider','发货':'woTypeShipping'};
+
+let LANG = localStorage.getItem('dashLang') || 'zh';
+function t(k, vars){
+  let s = (I18N[LANG] && I18N[LANG][k]) || I18N.zh[k] || k;
+  if (vars) Object.keys(vars).forEach(v => { s = s.split('{' + v + '}').join(vars[v]); });
+  return s;
+}
+function fmt(n){ return Number(n).toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN'); }
+function pc(v, d){ const s = Number(v).toFixed(d === undefined ? 1 : d); return LANG === 'de' ? s + ' %' : s + '%'; }
 
 const REG = regions[0];
 function sum(map, keys){ return keys.reduce((s,k)=> s + (map[REG+'|'+k]||0), 0); }
-function fmt(n){ return n.toLocaleString(); }
 
-// ---- KPI ----
-const ticketTot = sum(stock, tiers);
-const naTot = sum(noAction, tiers);
-const woTot = sum(woStock, types);
-const onsiteTot = sum(onsite, tiers);
-const naPct = ticketTot ? Math.round(naTot / ticketTot * 100) : 0;
-const woPct = ticketTot ? (woTot / ticketTot * 100) : 0;
-const nt = sum(newThis, tiers), nl = sum(newLast, tiers);
-const ct = sum(closedThis, tiers), cl = sum(closedLast, tiers);
-const naCls = naPct >= 45 ? 'risk' : (naPct >= 25 ? 'warn' : '');
-const oldTot = ageAll[REG+'|>3m'] || 0;
-const oldShare = ticketTot ? (oldTot / ticketTot * 100) : 0;
-const internalWO = woStock[REG+'|内部上门'] || 0;
-document.getElementById('kpiRow').innerHTML = `
-  <div class="kpi">
-    <div class="k-label">Ticket 存量</div>
-    <div class="k-val num">${fmt(ticketTot)}</div>
-    <div class="k-sub">未关闭待处理客诉</div>
-  </div>
-  <div class="kpi emph">
-    <div class="k-label">超 3 个月未关闭<span class="badge">积压</span></div>
-    <div class="k-val num">${fmt(oldTot)}</div>
-    <div class="k-sub">占存量 ${oldShare.toFixed(1)}% · 优先清理</div>
-  </div>
-  <div class="kpi ${naCls}">
-    <div class="k-label">无动作</div>
-    <div class="k-val num">${naPct}%</div>
-    <div class="k-sub">${fmt(naTot)} 条 · 5 个工作日无更新</div>
-  </div>
-  <div class="kpi">
-    <div class="k-label">本周新增</div>
-    <div class="k-val num">${fmt(nt)}</div>
-    <div class="k-sub">上周 ${fmt(nl)} · 环比 ${(nt-nl>0?'+':'')}${fmt(nt-nl)}</div>
-  </div>
-  <div class="kpi">
-    <div class="k-label">本周关闭</div>
-    <div class="k-val num">${fmt(ct)}</div>
-    <div class="k-sub">上周 ${fmt(cl)} · 环比 ${(ct-cl>0?'+':'')}${fmt(ct-cl)}</div>
-  </div>
-  <div class="kpi emph2">
-    <div class="k-label">WO 内部上门<span class="badge sand">自有团队</span></div>
-    <div class="k-val num">${fmt(internalWO)}</div>
-    <div class="k-sub">自有团队上门工单存量</div>
-  </div>`;
-
-// ---- Ticket 分层：堆叠占比条 + 数字块 ----
-let segs = '', cells = '';
-tiers.forEach((t, i)=>{
-  const s = stock[REG+'|'+t] || 0;
-  const na = noAction[REG+'|'+t] || 0;
-  const share = ticketTot ? (s / ticketTot * 100) : 0;
-  const naPctT = s ? (na / s * 100) : 0;
-  segs += `<div class="seg s${i+1}" style="width:${share}%" title="${t} ${fmt(s)}">${share >= 5 ? t : ''}</div>`;
-  const naCls = naPctT >= 45 ? 'risk' : (naPctT >= 25 ? 'warn' : '');
-  cells += `
-    <div class="tier-cell c${i+1}">
-      <div class="t-name">${t}</div>
-      <div class="t-val num">${fmt(s)}</div>
-      <div class="t-share">占 DA 存量 ${share.toFixed(1)}%</div>
-      <div class="t-na ${naCls}">无动作 <b>${fmt(na)}</b>（${naPctT.toFixed(0)}%）</div>
-    </div>`;
-});
-document.getElementById('tierStack').innerHTML = segs;
-document.getElementById('tierGrid').innerHTML = cells;
-document.getElementById('tierSub').textContent =
-  `合计 ${fmt(ticketTot)} · 其中无动作 ${fmt(naTot)}（${naPct}%）　｜　占比条 = 各层级构成`;
-
-// ---- 账龄：未关闭 / 新建未处理 ----
 const ageKeys = ['>3m', '1-3m', '<1m'];
-const ageLabels = {'>3m': '超过 3 个月', '1-3m': '1 – 3 个月', '<1m': '1 个月以内'};
-const ageAllTot = ageKeys.reduce((s, k)=> s + (ageAll[REG+'|'+k] || 0), 0);
-const ageNewTot = ageKeys.reduce((s, k)=> s + (ageNew[REG+'|'+k] || 0), 0);
-let aSegs = '', aCells = '';
-ageKeys.forEach((k, i)=>{
-  const v = ageAll[REG+'|'+k] || 0;
-  const nv = ageNew[REG+'|'+k] || 0;
-  const share = ageAllTot ? (v / ageAllTot * 100) : 0;
-  aSegs += `<div class="seg g${i+1}" style="width:${share}%" title="${ageLabels[k]} ${fmt(v)}">${share >= 8 ? k : ''}</div>`;
-  aCells += `
-    <div class="age-cell a${i+1}${k === '>3m' ? ' hot' : ''}">
-      <div class="a-name">${ageLabels[k]}${k === '>3m' ? '<span class="a-flag">优先清理</span>' : ''}</div>
-      <div class="a-val num">${fmt(v)}</div>
-      <div class="a-share">占未关闭 ${share.toFixed(1)}%</div>
-      <div class="a-new">新建未处理 <b>${fmt(nv)}</b>${nv ? `（占本档 ${(v ? nv/v*100 : 0).toFixed(0)}%）` : ''}</div>
-    </div>`;
-});
-document.getElementById('ageStackAll').innerHTML = aSegs;
-document.getElementById('ageGrid').innerHTML = aCells;
-document.getElementById('ageSub').textContent =
-  `未关闭合计 ${fmt(ageAllTot)}（按创建时间分档）；其中「新建未处理」(状态=Created) ${fmt(ageNewTot)} 条`;
+const AGE_KEY = {'>3m':'ageL1', '1-3m':'ageL2', '<1m':'ageL3'};
 
-// ---- 本周变化 ----
-function delta(cur, prev, goodWhenDown){
-  const d = cur - prev;
-  const cls = d === 0 ? 'flat' : ((d > 0) !== !!goodWhenDown ? 'up' : 'down');
-  return `<span class="${cls}">${d>0?'+':''}${fmt(d)}</span>`;
-}
-document.getElementById('deltaTable').innerHTML = `
-  <tr><th>指标</th><th>本周</th><th>上周</th><th>环比</th></tr>
-  <tr><td>新增 Ticket</td><td class="num">${fmt(nt)}</td><td class="num">${fmt(nl)}</td><td class="num">${delta(nt,nl,true)}</td></tr>
-  <tr><td>关闭 Ticket</td><td class="num">${fmt(ct)}</td><td class="num">${fmt(cl)}</td><td class="num">${delta(ct,cl,false)}</td></tr>
-  <tr class="total"><td>净变化</td><td class="num">${(nt-ct>0?'+':'')}${fmt(nt-ct)}</td><td class="num">${(nl-cl>0?'+':'')}${fmt(nl-cl)}</td><td class="num">${delta(nt-ct, nl-cl, true)}</td></tr>`;
-
-// ---- WO ----
-let wRows = '';
-types.forEach(t=>{
-  const v = woStock[REG+'|'+t] || 0;
-  wRows += `<tr${t === '内部上门' ? ' class="hot"' : ''}><td>${t}${t === '内部上门' ? ' · 自有团队' : ''}</td><td class="num">${fmt(v)}</td></tr>`;
-});
-wRows += `<tr class="total"><td>合计</td><td class="num">${fmt(woTot)}</td></tr>`;
-document.getElementById('woTable').innerHTML = wRows;
-document.getElementById('woNote').innerHTML =
-  `已转上门工单 <b class="num">${fmt(onsiteTot)}</b> 条单独统计，不计入 Ticket 存量`;
-const woNoteB = document.querySelector('#woNote b');
-if (woNoteB) woNoteB.style.fontFamily = "'IBM Plex Mono',monospace";
-
-// ---- Hotline ----
+// ---- Hotline 静态数据（Genesys Cloud，脚本不更新）----
 const hotlineQueues = {
   "德语区(DE/AT)": [
     {name:"GER-On-Site", offer:6, answer:4, abandon:2},
@@ -342,54 +311,213 @@ const hotlineQueues = {
     {name:"GER_End_User", offer:133, answer:10, abandon:58},
   ],
 };
-const hb = document.getElementById('hotlineBars');
-const queues = hotlineQueues[REG];
-if(!queues){
-  hb.innerHTML = '<div class="sub">暂无队列数据</div>';
-} else {
-  const tOffer = queues.reduce((s,q)=>s+q.offer,0);
-  const tAns = queues.reduce((s,q)=>s+q.answer,0);
-  const tAb = queues.reduce((s,q)=>s+q.abandon,0);
-  function bar(q){
-    const aPct = q.offer ? q.answer / q.offer * 100 : 0;
-    const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
-    const restPct = Math.max(0, 100 - aPct - abPct);
-    return `<div class="q-bar">
-        <div class="seg answered" style="width:${aPct}%"></div>
-        <div class="seg abandoned" style="width:${abPct}%"></div>
-        <div class="seg rest" style="width:${restPct}%"></div>
-      </div>`;
-  }
-  let rows = '';
-  queues.forEach(q=>{
-    const aPct = q.offer ? q.answer / q.offer * 100 : 0;
-    const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
-    const rCls = aPct < 50 ? 'low' : (aPct < 80 ? 'mid' : '');
-    rows += `
-      <div class="q-row">
-        <div class="q-name">${q.name}</div>
-        ${bar(q)}
-        <div class="q-stats">
-          <span>来电 <b>${q.offer}</b></span>
-          <span class="rate ${rCls}">接起率 <b>${aPct.toFixed(0)}%</b></span>
-          <span>放弃率 <b class="${abPct>=30?'up':''}">${abPct.toFixed(0)}%</b></span>
-        </div>
+
+function delta(cur, prev, goodWhenDown){
+  const d = cur - prev;
+  const cls = d === 0 ? 'flat' : ((d > 0) !== !!goodWhenDown ? 'up' : 'down');
+  return `<span class="${cls}">${d>0?'+':''}${fmt(d)}</span>`;
+}
+
+/* ========== 渲染 ========== */
+function render(){
+  document.documentElement.lang = LANG === 'de' ? 'de' : 'zh-CN';
+  document.title = t('pageTitle');
+  document.getElementById('pageH1').textContent = t('pageTitle');
+  const ps = weekStart.toLocaleDateString('sv-SE');
+  const pe = new Date(weekStart.getTime() + 6 * 86400000);
+  const pStr = ps + ' ~ ' + pe.toLocaleDateString('sv-SE').slice(5);
+  document.getElementById('periodLine').textContent = t('period', {p: pStr});
+  document.getElementById('pulledLabel').textContent = t('pulled');
+  document.getElementById('pulledTime').textContent =
+    PULLED.toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN',
+      {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+
+  // ---- KPI ----
+  const ticketTot = sum(stock, tiers), naTot = sum(noAction, tiers);
+  const woTot = sum(woStock, types), onsiteTot = sum(onsite, tiers);
+  const naPct = ticketTot ? Math.round(naTot / ticketTot * 100) : 0;
+  const nt = sum(newThis, tiers), nl = sum(newLast, tiers);
+  const ct = sum(closedThis, tiers), cl = sum(closedLast, tiers);
+  const naCls = naPct >= 45 ? 'risk' : (naPct >= 25 ? 'warn' : '');
+  const oldTot = ageAll[REG+'|>3m'] || 0;
+  const oldShare = ticketTot ? (oldTot / ticketTot * 100) : 0;
+  const internalWO = woStock[REG+'|内部上门'] || 0;
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi">
+      <div class="k-label">${t('kStock')}</div>
+      <div class="k-val num">${fmt(ticketTot)}</div>
+      <div class="k-sub">${t('kStockSub')}</div>
+    </div>
+    <div class="kpi emph">
+      <div class="k-label">${t('kOld')}<span class="badge">${t('bOld')}</span></div>
+      <div class="k-val num">${fmt(oldTot)}</div>
+      <div class="k-sub">${t('kOldSub', {s: pc(oldShare)})}</div>
+    </div>
+    <div class="kpi ${naCls}">
+      <div class="k-label">${t('kNa')}</div>
+      <div class="k-val num">${naPct}${LANG==='de'?' %':'%'}</div>
+      <div class="k-sub">${t('kNaSub', {n: fmt(naTot)})}</div>
+    </div>
+    <div class="kpi">
+      <div class="k-label">${t('kNew')}</div>
+      <div class="k-val num">${fmt(nt)}</div>
+      <div class="k-sub">${t('kNewSub', {p: fmt(nl), d: (nt-nl>0?'+':'') + fmt(nt-nl)})}</div>
+    </div>
+    <div class="kpi">
+      <div class="k-label">${t('kClosed')}</div>
+      <div class="k-val num">${fmt(ct)}</div>
+      <div class="k-sub">${t('kClosedSub', {p: fmt(cl), d: (ct-cl>0?'+':'') + fmt(ct-cl)})}</div>
+    </div>
+    <div class="kpi emph2">
+      <div class="k-label">${t('kWO')}<span class="badge sand">${t('bOwn')}</span></div>
+      <div class="k-val num">${fmt(internalWO)}</div>
+      <div class="k-sub">${t('kWOSub')}</div>
+    </div>`;
+
+  // ---- Ticket 分层 ----
+  let segs = '', cells = '';
+  tiers.forEach((tr, i)=>{
+    const s = stock[REG+'|'+tr] || 0;
+    const na = noAction[REG+'|'+tr] || 0;
+    const share = ticketTot ? (s / ticketTot * 100) : 0;
+    const naPctT = s ? (na / s * 100) : 0;
+    segs += `<div class="seg s${i+1}" style="width:${share}%" title="${tr} ${fmt(s)}">${share >= 5 ? tr : ''}</div>`;
+    const c = naPctT >= 45 ? 'risk' : (naPctT >= 25 ? 'warn' : '');
+    cells += `
+      <div class="tier-cell c${i+1}">
+        <div class="t-name">${tr}</div>
+        <div class="t-val num">${fmt(s)}</div>
+        <div class="t-share">${t('tierShare', {s: pc(share)})}</div>
+        <div class="t-na ${c}">${t('tierNa')} <b>${fmt(na)}</b>（${pc(naPctT, 0)}）</div>
       </div>`;
   });
-  const tAPct = tOffer ? tAns/tOffer*100 : 0;
-  const tAbPct = tOffer ? tAb/tOffer*100 : 0;
-  rows += `
-    <div class="q-row" style="margin-top:10px;border-top:1px solid var(--ink);padding-top:9px;">
-      <div class="q-name">合计</div>
-      ${bar({offer:tOffer, answer:tAns, abandon:tAb})}
-      <div class="q-stats">
-        <span>来电 <b>${tOffer}</b></span>
-        <span class="rate ${tAPct<50?'low':(tAPct<80?'mid':'')}">接起率 <b>${tAPct.toFixed(1)}%</b></span>
-        <span>放弃率 <b class="${tAbPct>=30?'up':''}">${tAbPct.toFixed(1)}%</b></span>
-      </div>
-    </div>`;
-  hb.innerHTML = rows;
+  document.getElementById('tierTitle').textContent = t('tierTitle');
+  document.getElementById('tierStack').innerHTML = segs;
+  document.getElementById('tierGrid').innerHTML = cells;
+  document.getElementById('tierSub').textContent =
+    t('tierSub', {tot: fmt(ticketTot), na: fmt(naTot), pct: naPct});
+
+  // ---- 账龄 ----
+  const ageAllTot = ageKeys.reduce((s, k)=> s + (ageAll[REG+'|'+k] || 0), 0);
+  const ageNewTot = ageKeys.reduce((s, k)=> s + (ageNew[REG+'|'+k] || 0), 0);
+  let aSegs = '', aCells = '';
+  ageKeys.forEach((k, i)=>{
+    const v = ageAll[REG+'|'+k] || 0;
+    const nv = ageNew[REG+'|'+k] || 0;
+    const share = ageAllTot ? (v / ageAllTot * 100) : 0;
+    const lbl = t(AGE_KEY[k]);
+    aSegs += `<div class="seg g${i+1}" style="width:${share}%" title="${lbl} ${fmt(v)}">${share >= 8 ? k : ''}</div>`;
+    aCells += `
+      <div class="age-cell a${i+1}${k === '>3m' ? ' hot' : ''}">
+        <div class="a-name">${lbl}${k === '>3m' ? `<span class="a-flag">${t('ageFlag')}</span>` : ''}</div>
+        <div class="a-val num">${fmt(v)}</div>
+        <div class="a-share">${t('ageShare', {s: pc(share)})}</div>
+        <div class="a-new">${t('ageNew')} <b>${fmt(nv)}</b>${nv ? `（${t('ageOf', {s: pc(v ? nv/v*100 : 0, 0)})}）` : ''}</div>
+      </div>`;
+  });
+  document.getElementById('ageTitle').textContent = t('ageTitle');
+  document.getElementById('ageStackAll').innerHTML = aSegs;
+  document.getElementById('ageGrid').innerHTML = aCells;
+  document.getElementById('ageSub').textContent =
+    t('ageSub', {tot: fmt(ageAllTot), nw: fmt(ageNewTot)});
+
+  // ---- 本周变化 ----
+  document.getElementById('deltaTitle').textContent = t('deltaTitle');
+  document.getElementById('deltaSub').textContent = t('deltaSub');
+  document.getElementById('deltaNote').textContent = t('deltaNote');
+  document.getElementById('deltaTable').innerHTML = `
+    <tr><th>${t('thMetric')}</th><th>${t('thThis')}</th><th>${t('thLast')}</th><th>${t('thDelta')}</th></tr>
+    <tr><td>${t('rowNew')}</td><td class="num">${fmt(nt)}</td><td class="num">${fmt(nl)}</td><td class="num">${delta(nt,nl,true)}</td></tr>
+    <tr><td>${t('rowClosed')}</td><td class="num">${fmt(ct)}</td><td class="num">${fmt(cl)}</td><td class="num">${delta(ct,cl,false)}</td></tr>
+    <tr class="total"><td>${t('rowNet')}</td><td class="num">${(nt-ct>0?'+':'')}${fmt(nt-ct)}</td><td class="num">${(nl-cl>0?'+':'')}${fmt(nl-cl)}</td><td class="num">${delta(nt-ct, nl-cl, true)}</td></tr>`;
+
+  // ---- WO ----
+  let wRows = '';
+  types.forEach(ty=>{
+    const v = woStock[REG+'|'+ty] || 0;
+    const hot = ty === '内部上门';
+    wRows += `<tr${hot ? ' class="hot"' : ''}><td>${t(WO_TYPE_KEY[ty])}${hot ? ' · ' + t('woOwn') : ''}</td><td class="num">${fmt(v)}</td></tr>`;
+  });
+  wRows += `<tr class="total"><td>${t('woTotal')}</td><td class="num">${fmt(woTot)}</td></tr>`;
+  document.getElementById('woTitle').textContent = t('woTitle');
+  document.getElementById('woSub').textContent = t('woSub');
+  document.getElementById('woTable').innerHTML = wRows;
+  document.getElementById('woNote').innerHTML = t('woNote', {n: fmt(onsiteTot)});
+
+  // ---- Hotline ----
+  document.getElementById('hotlineTitle').textContent = t('hotlineTitle');
+  document.getElementById('hotlineSub').textContent = t('hotlineSub');
+  document.getElementById('hotlineLegend').innerHTML =
+    `<span><i class="l-ans"></i>${t('legAns')}</span>
+     <span><i class="l-ab"></i>${t('legAb')}</span>
+     <span><i class="l-rest"></i>${t('legRest')}</span>`;
+  const hb = document.getElementById('hotlineBars');
+  const queues = hotlineQueues[REG];
+  if(!queues){
+    hb.innerHTML = `<div class="sub">—</div>`;
+  } else {
+    const tOffer = queues.reduce((s,q)=>s+q.offer,0);
+    const tAns = queues.reduce((s,q)=>s+q.answer,0);
+    const tAb = queues.reduce((s,q)=>s+q.abandon,0);
+    function bar(q){
+      const aPct = q.offer ? q.answer / q.offer * 100 : 0;
+      const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
+      const restPct = Math.max(0, 100 - aPct - abPct);
+      return `<div class="q-bar">
+          <div class="seg answered" style="width:${aPct}%"></div>
+          <div class="seg abandoned" style="width:${abPct}%"></div>
+          <div class="seg rest" style="width:${restPct}%"></div>
+        </div>`;
+    }
+    const rate = (p) => p < 50 ? 'low' : (p < 80 ? 'mid' : '');
+    let rows = '';
+    queues.forEach(q=>{
+      const aPct = q.offer ? q.answer / q.offer * 100 : 0;
+      const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
+      rows += `
+        <div class="q-row">
+          <div class="q-name">${q.name}</div>
+          ${bar(q)}
+          <div class="q-stats">
+            <span>${t('qCalls')} <b>${fmt(q.offer)}</b></span>
+            <span class="rate ${rate(aPct)}">${t('qRate')} <b>${pc(aPct, 1)}</b></span>
+            <span>${t('qAbandon')} <b class="${abPct>=30?'up':''}">${pc(abPct, 1)}</b></span>
+          </div>
+        </div>`;
+    });
+    const tAPct = tOffer ? tAns/tOffer*100 : 0;
+    const tAbPct = tOffer ? tAb/tOffer*100 : 0;
+    rows += `
+      <div class="q-row" style="margin-top:10px;border-top:1px solid var(--ink);padding-top:9px;">
+        <div class="q-name">${t('qTotal')}</div>
+        ${bar({offer:tOffer, answer:tAns, abandon:tAb})}
+        <div class="q-stats">
+          <span>${t('qCalls')} <b>${fmt(tOffer)}</b></span>
+          <span class="rate ${rate(tAPct)}">${t('qRate')} <b>${pc(tAPct, 1)}</b></span>
+          <span>${t('qAbandon')} <b class="${tAbPct>=30?'up':''}">${pc(tAbPct, 1)}</b></span>
+        </div>
+      </div>`;
+    hb.innerHTML = rows;
+  }
+
+  // ---- 页脚 ----
+  document.getElementById('footNote').innerHTML = t('foot');
+
+  // ---- 语言按钮状态 ----
+  document.querySelectorAll('#langSwitch button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.lang === LANG);
+  });
 }
+
+document.querySelectorAll('#langSwitch button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    LANG = b.dataset.lang;
+    localStorage.setItem('dashLang', LANG);
+    render();
+  });
+});
+
+render();
 </script>
 </body>
 </html>
