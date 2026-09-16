@@ -99,38 +99,38 @@
   @media (max-height:960px){
     .wrap{padding:10px 16px 12px;}
     header{padding-bottom:7px;margin-bottom:9px;}
-    header h1{font-size:22px;}
+    header h1{font-size:21px;}
     header .period{font-size:12px;margin-top:3px;}
     .kpi-strip{margin-bottom:10px;gap:8px;}
     .kpi{padding:9px 11px 10px;}
     .kpi .k-val{font-size:23px;}
     .kpi .k-label,.kpi .k-sub{font-size:10px;}
-    .kpi .k-sub{margin-top:3px;}
+    .kpi .k-sub{margin-top:2px;line-height:1.25;}
     .kpi .k-val{margin-top:3px;}
     .card{padding:11px 14px 12px;margin-bottom:11px;}
     .card h2{font-size:15px;}
     .card h2::before{height:13px;}
     .card .sub{font-size:10.5px;margin-bottom:7px;}
-    .blk + .blk{margin-top:10px;padding-top:9px;}
+    .blk + .blk{margin-top:8px;padding-top:7px;}
     .blk-name{font-size:10.5px;margin-bottom:4px;}
     .stack{height:18px;margin-bottom:7px;}
     .tier-cell,.age-cell{padding:7px 10px;}
-    .tier-cell .t-val,.age-cell .a-val{font-size:20px;margin-top:1px;}
+    .tier-cell .t-val,.age-cell .a-val{font-size:19px;margin-top:1px;}
     .age-cell.hot .a-val{font-size:23px;}
     .tier-cell .t-name,.age-cell .a-name,.tier-cell .t-meta,.age-cell .a-meta{font-size:10px;}
     .tre-grid,.tier-grid,.age-grid{gap:9px;}
     .tre-cell{padding:8px 11px;}
     .tre-cell .tre-val{font-size:22px;}
     .tre-cell .tre-sub{font-size:10px;margin-top:2px;}
-    table{font-size:12.5px;}
-    td{padding:3px 0;}
+    table{font-size:12px;}
+    td{padding:2px 0;}
     th{padding-bottom:4px;}
-    .q-row{margin-bottom:4px;}
+    .q-row{margin-bottom:3px;}
     .q-bar{height:14px;}
     .q-stats{font-size:11px;}
     .q-stats .rate b{font-size:14px;}
     .legend{margin-bottom:7px;}
-    footer{padding-top:6px;margin-top:8px;font-size:10.5px;line-height:1.5;}
+    footer{padding-top:5px;margin-top:7px;font-size:10px;line-height:1.4;}
   }
   }
 
@@ -309,27 +309,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789569049166);
+const PULLED = new Date(0);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2532,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":84,"德语区(DE/AT)|L4":26};
-const noAction = {"德语区(DE/AT)|L1":431,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":432,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":155,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
-const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
-const closedThis = {"德语区(DE/AT)|L1":182,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":299,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
-const ageAll = {"德语区(DE/AT)|>3m":325,"德语区(DE/AT)|1-3m":956,"德语区(DE/AT)|<1m":1428};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":232,"德语区(DE/AT)|<1m":979};
-const weekStart = new Date(1789336800000);
+const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
+const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const weekStart = new Date(0);
 const trengoNew = 0;            // DA WA 新单待分派
 const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 25;       // DA WA 处理中
-const trengoClosedThis = 134;     // DA WA 本周已处理
-const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789569049166);
+const trengoAssigned = 0;       // DA WA 处理中
+const trengoClosedThis = 0;     // DA WA 本周已处理
+const trengoClosedLast = 0;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(0);
 
 /* ========== 双语词典 ========== */
 const I18N = {
