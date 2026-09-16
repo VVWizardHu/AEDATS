@@ -101,6 +101,8 @@
     .kpi{padding:9px 11px 10px;}
     .kpi .k-val{font-size:23px;}
     .kpi .k-label,.kpi .k-sub{font-size:10px;}
+    .kpi .k-sub{margin-top:3px;}
+    .kpi .k-val{margin-top:3px;}
     .card{padding:11px 14px 12px;margin-bottom:11px;}
     .card h2{font-size:15px;}
     .card h2::before{height:13px;}
@@ -117,10 +119,10 @@
     .tre-cell .tre-val{font-size:22px;}
     .tre-cell .tre-sub{font-size:10px;margin-top:2px;}
     table{font-size:12.5px;}
-    td{padding:4px 0;}
+    td{padding:3px 0;}
     th{padding-bottom:4px;}
     .q-row{margin-bottom:4px;}
-    .q-bar{height:15px;}
+    .q-bar{height:14px;}
     .q-stats{font-size:11px;}
     .q-stats .rate b{font-size:14px;}
     .legend{margin-bottom:7px;}
@@ -189,7 +191,7 @@
   tr.total td{border-top:1px solid var(--ink);border-bottom:none;font-weight:600;}
   .up{color:var(--rust-ink);} .down{color:var(--moss-ink);} .flat{color:var(--ink-soft);}
   .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;background:var(--teal-soft);color:var(--teal-ink);}
-  .note{font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--hair);padding-top:8px;margin-top:9px;line-height:1.5;}
+  .note{font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--hair);padding-top:7px;margin-top:8px;line-height:1.45;}
 
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
   .two-col .card{margin-bottom:14px;display:flex;flex-direction:column;}
@@ -303,27 +305,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789568650283);
+const PULLED = new Date(1789568865403);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2534,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":84,"德语区(DE/AT)|L4":26};
-const noAction = {"德语区(DE/AT)|L1":432,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
+const stock = {"德语区(DE/AT)|L1":2532,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":84,"德语区(DE/AT)|L4":26};
+const noAction = {"德语区(DE/AT)|L1":431,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
 const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":432,"德语区(DE/AT)|L4":0};
 const newThis = {"德语区(DE/AT)|L1":155,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
 const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
-const closedThis = {"德语区(DE/AT)|L1":180,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
+const closedThis = {"德语区(DE/AT)|L1":182,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
 const woStock = {"德语区(DE/AT)|发货":299,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
-const ageAll = {"德语区(DE/AT)|>3m":326,"德语区(DE/AT)|1-3m":957,"德语区(DE/AT)|<1m":1428};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":233,"德语区(DE/AT)|<1m":980};
+const ageAll = {"德语区(DE/AT)|>3m":325,"德语区(DE/AT)|1-3m":956,"德语区(DE/AT)|<1m":1428};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":232,"德语区(DE/AT)|<1m":979};
 const weekStart = new Date(1789336800000);
 const trengoNew = 0;            // DA WA 新单待分派
 const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
 const trengoAssigned = 26;       // DA WA 处理中
 const trengoClosedThis = 133;     // DA WA 本周已处理
 const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789568650283);
+const TRENGO_PULLED = new Date(1789568865403);
 
 /* ========== 双语词典 ========== */
 const I18N = {
@@ -361,7 +363,7 @@ const I18N = {
     treDone:'本周已处理', treDoneSub:'上周 <b>{p}</b> · 环比 {d}',
     legAns:'接起', legAb:'放弃', legRest:'其他未接', legOther:'其他未接',
     qCalls:'来电', qRate:'接起率', qAbandon:'放弃率', qTotal:'合计',
-    foot:'Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）',
+    foot:'口径：存量 = Created + In Progress(Service)（<b>不含</b>已转上门工单）　·　关闭以 alp_closedstatusupdatedon 为准　·　地区仅德语区(DE/AT)<br>字段：Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
     woTypeInternal:'内部上门', woTypeProvider:'服务商上门', woTypeShipping:'发货',
   },
   de: {
@@ -398,7 +400,7 @@ const I18N = {
     treDone:'Diese Woche erledigt', treDoneSub:'Vorwoche <b>{p}</b> · Δ {d}',
     legAns:'angenommen', legAb:'abgebrochen', legRest:'sonst. verpasst', legOther:'sonst. verpasst',
     qCalls:'Anrufe', qRate:'Annahmequote', qAbandon:'Abbruchquote', qTotal:'Gesamt',
-    foot:'Ticket-Kriterien: alp_casegrade / alp_casestatus　·　Work-Order-Kriterien: alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>Region: nur deutschsprachiger Raum (DE/AT); Bestand = Created + In Progress(Service) (ohne an Onsite-Tickets übergebene Fälle)',
+    foot:'Definition: Bestand = Created + In Progress(Service) (<b>ohne</b> an Onsite-Tickets übergebene Fälle)　·　Schließung nach alp_closedstatusupdatedon　·　Region: nur DE/AT<br>Felder: Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
     woTypeInternal:'Innen-Onsite', woTypeProvider:'Dienstleister-Onsite', woTypeShipping:'Versand',
   }
 };
