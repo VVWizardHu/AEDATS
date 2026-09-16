@@ -38,6 +38,14 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:50;
     background:linear-gradient(90deg,var(--brand) 0,var(--teal) 45%,var(--blue) 100%);}
   .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
+  /* 数据新鲜度：圆点 = 状态指示（非文字 UI，对卡片白 ≥3:1）*/
+  .fresh{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+  .fresh i{width:7px;height:7px;border-radius:50%;background:var(--teal);flex:0 0 auto;}
+  .fresh.warn i{background:var(--amber);}
+  .fresh.stale i{background:var(--rust);}
+  /* 表格行 hover：扫读定位用。按标准"几十次/天"档 → 不做过渡动画，只给静态反馈；
+     并用 @media (hover:hover) 门控，避免触屏上"粘住" */
+  @media (hover:hover){ tbody tr:hover td{background:var(--brand-soft);} }
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
   .wrap{max-width:1720px;margin:0 auto;padding:18px 24px 26px;}
 
@@ -251,7 +259,7 @@
         <button type="button" data-lang="zh">中文</button>
         <button type="button" data-lang="de">Deutsch</button>
       </div>
-      <div class="pulled"><span id="pulledLabel"></span><span class="num" id="pulledTime"></span></div>
+      <div class="pulled"><span id="pulledLabel"></span><span class="num" id="pulledTime"></span><span id="freshCRM"></span></div>
     </div>
   </header>
 
@@ -309,27 +317,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789569172316);
+const PULLED = new Date(0);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2532,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":84,"德语区(DE/AT)|L4":26};
-const noAction = {"德语区(DE/AT)|L1":431,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":432,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":155,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
-const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
-const closedThis = {"德语区(DE/AT)|L1":182,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":299,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
-const ageAll = {"德语区(DE/AT)|>3m":325,"德语区(DE/AT)|1-3m":956,"德语区(DE/AT)|<1m":1428};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":232,"德语区(DE/AT)|<1m":979};
-const weekStart = new Date(1789336800000);
-const trengoNew = 1;            // DA WA 新单待分派
-const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 25;       // DA WA 处理中
-const trengoClosedThis = 134;     // DA WA 本周已处理
-const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789569623862);
+const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
+const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const weekStart = new Date(0);
+const trengoNew = 0;            // DA WA 新单待分派
+const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 0;       // DA WA 处理中
+const trengoClosedThis = 0;     // DA WA 本周已处理
+const trengoClosedLast = 0;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(0);
 
 /* ========== 双语词典 ========== */
 const I18N = {
@@ -337,6 +345,7 @@ const I18N = {
     pageTitle:'DA 技术服务日常看板',
     period:'周期 {p}　·　数据来源 D365 CRM',
     pulled:'拉取时间',
+    agoNow:'刚刚', agoMin:'{n} 分钟前', agoHr:'{n} 小时前', freshTitle:'数据新鲜度',
     kStock:'Ticket 存量', kStockSub:'未关闭待处理客诉',
     kOld:'超 3 个月未关闭', kOldSub:'占存量 {s} · 优先清理', bOld:'积压',
     kNa:'无动作', kNaSub:'{n} 条 · 5 个工作日无更新',
@@ -374,6 +383,7 @@ const I18N = {
     pageTitle:'DA Technischer Service – Tagesübersicht',
     period:'Zeitraum {p}　·　Datenquelle: D365 CRM',
     pulled:'Abgerufen',
+    agoNow:'gerade eben', agoMin:'vor {n} Min.', agoHr:'vor {n} Std.', freshTitle:'Datenaktualität',
     kStock:'Ticket-Bestand', kStockSub:'Offene, unbearbeitete Fälle',
     kOld:'Offen über 3 Monate', kOldSub:'{s} des Bestands · vorrangig bearbeiten', bOld:'Rückstand',
     kNa:'Ohne Aktivität', kNaSub:'{n} Fälle · 5 Werktage ohne Update',
@@ -419,6 +429,19 @@ function t(k, vars){
 function fmt(n){ return Number(n).toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN'); }
 function pc(v, d){ const s = Number(v).toFixed(d === undefined ? 1 : d); return LANG === 'de' ? s + ' %' : s + '%'; }
 
+/* 数据新鲜度：≤90 分钟=正常，≤4 小时=偏旧，>4 小时=过期（cron 每小时/20 分钟刷新，超时说明没跑成） */
+function agoText(min){
+  if (min < 1) return t('agoNow');
+  if (min < 60) return t('agoMin', {n: Math.round(min)});
+  return t('agoHr', {n: (min / 60).toFixed(1)});
+}
+function freshChip(ts){
+  if (!ts || !ts.getTime()) return '';
+  const min = (Date.now() - ts.getTime()) / 60000;
+  const cls = min <= 90 ? 'ok' : (min <= 240 ? 'warn' : 'stale');
+  return `<span class="fresh ${cls}" title="${t('freshTitle')}"><i></i>${agoText(min)}</span>`;
+}
+
 const REG = regions[0];
 function sum(map, keys){ return keys.reduce((s,k)=> s + (map[REG+'|'+k]||0), 0); }
 
@@ -453,6 +476,7 @@ function render(){
   document.getElementById('pulledTime').textContent =
     PULLED.toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN',
       {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+  document.getElementById('freshCRM').innerHTML = freshChip(PULLED);
 
   // ---- KPI ----
   const ticketTot = sum(stock, tiers), naTot = sum(noAction, tiers);
@@ -575,7 +599,7 @@ function render(){
         {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
     : '—';
   document.getElementById('trengoTitle').textContent = t('treTitle');
-  document.getElementById('trengoSub').textContent = t('treSub', {t: treDT});
+  document.getElementById('trengoSub').innerHTML = t('treSub', {t: treDT}) + '　' + freshChip(TRENGO_PULLED);
   const treDelta = trengoClosedThis - trengoClosedLast;
   document.getElementById('treGrid').innerHTML = `
     <div class="tre-cell">
