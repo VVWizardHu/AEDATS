@@ -108,7 +108,7 @@
 
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
   .two-col .card{margin-bottom:14px;display:flex;flex-direction:column;}
-  .two-col .card .tbl-fill{margin-top:auto;}
+  .two-col .card .note{margin-top:auto;}
   @media (max-width:820px){.two-col{grid-template-columns:1fr;}}
 
   /* ---- Hotline ---- */
@@ -173,7 +173,7 @@
       <h2>Work Order 存量 · 分类型</h2>
       <div class="sub">未完成工单，剔除已发货(Shipped)</div>
       <div class="tbl-fill"><table id="woTable"></table></div>
-      <div class="note">已转上门工单单独列出，不计入 Ticket 存量</div>
+      <div class="note" id="woNote"></div>
     </div>
   </div>
 
@@ -195,7 +195,7 @@
 </div>
 
 <script>
-const PULLED = new Date(1789553032014);
+const PULLED = new Date(1789553224723);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -328,8 +328,11 @@ types.forEach(t=>{
   wRows += `<tr${t === '内部上门' ? ' class="hot"' : ''}><td>${t}${t === '内部上门' ? ' · 自有团队' : ''}</td><td class="num">${fmt(v)}</td></tr>`;
 });
 wRows += `<tr class="total"><td>合计</td><td class="num">${fmt(woTot)}</td></tr>`;
-wRows += `<tr><td style="color:var(--ink-soft)">已转上门工单<br><span style="font-size:11px">（不计入 Ticket 存量）</span></td><td class="num" style="color:var(--ink-soft)">${fmt(onsiteTot)}</td></tr>`;
 document.getElementById('woTable').innerHTML = wRows;
+document.getElementById('woNote').innerHTML =
+  `已转上门工单 <b class="num">${fmt(onsiteTot)}</b> 条单独统计，不计入 Ticket 存量`;
+const woNoteB = document.querySelector('#woNote b');
+if (woNoteB) woNoteB.style.fontFamily = "'IBM Plex Mono',monospace";
 
 // ---- Hotline ----
 const hotlineQueues = {
