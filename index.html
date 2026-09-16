@@ -8,41 +8,44 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* ===== 设计 token（依据 ui-ux-design skill：看板 = Data-Dense Dashboard）=====
-       配色：柔和低饱和（祥和）+ WCAG 校验过的对比度
-         · 文字一律用 *-ink 变体（对浅底 ≥4.5:1）
-         · 图形填充 ≥3:1（对卡片白），并配不同角度纹样（色盲双编码）
-       间距：统一 4/8 栅格；看板用密集档 8–32px（不做营销页的大留白） */
-    --paper:#F2F5F3; --paper-top:#F7F9F8; --panel:#F8FAF9; --card:#FFFFFF;
-    --ink:#333F3D; --ink-soft:#687270; --hair:#D5DCD9;
-    --teal:#6A9C94; --teal-soft:#E4EEEC; --amber:#B08B58; --amber-soft:#F7EDDD;
-    --rust:#C38672; --rust-soft:#F5E5DF; --moss:#958EAD; --blue:#7F94A3;
-    --teal-ink:#4B716B; --amber-ink:#846741; --rust-ink:#885E50; --moss-ink:#6B6489;
-    --brand:#4B716B; --brand-soft:#E4EEEC; --brand-line:#CFDEDA;
+    /* ===== 现代色板（2026-09 换新）· 依据 ui-ux-design skill：冷调中性底 + 靛蓝强调 + 高对比数据色 =====
+       规则：文字色一律 ≥4.5:1；数据填充 ≥3:1（且白字对其 ≥4.5:1）；边框可见性 ≥1.5:1 —— 全部逐项算过 */
+    --paper:#F6F8FA; --paper-top:#FFFFFF; --panel:#F8FAFC; --card:#FFFFFF;
+    --ink:#0F172A; --ink-soft:#5A6675;
+    --hair:#C3CEDA;        /* 结构边框（卡片/输入/条）*/
+    --hair-soft:#E5EAF0;   /* 行分隔、虚线分区 */
+    --brand:#4F46E5; --brand-soft:#EEF2FF; --brand-line:#D6DBFB;   /* 靛蓝：UI 强调/焦点/选中 */
+    --c1:#2563EB; --c1-soft:#EFF6FF; --c1-ink:#1D4ED8;            /* L1 / 数据主色 */
+    --c2:#7C3AED; --c2-soft:#F5F3FF; --c2-ink:#6D28D9;            /* L2 */
+    --c3:#0E7490; --c3-soft:#ECFEFF; --c3-ink:#155E75;            /* L3 */
+    --c4:#475569; --c4-soft:#F1F5F9; --c4-ink:#334155;            /* L4 */
+    --ok:#047857; --ok-soft:#ECFDF5;                              /* 正向 / 接起 */
+    --warn:#B45309; --warn-soft:#FFFBEB; --warn-ink:#B45309;      /* 警告 / 1–3 月 */
+    --danger:#DC2626; --danger-soft:#FEF2F2; --danger-ink:#C81E1E;/* 危险 / >3 月 */
+    --ease-out:cubic-bezier(0.23,1,0.32,1);
     --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
     --radius:6px; --radius-sm:4px;
-    --ease-out:cubic-bezier(0.23,1,0.32,1);   /* 强 ease-out（UI 交互标准曲线） */
-    --shadow-card:0 1px 2px rgba(51,63,61,.05), 0 1px 8px rgba(51,63,61,.04);
+    --shadow-card:0 1px 2px rgba(15,23,42,.06), 0 1px 8px rgba(15,23,42,.04);
   }
-  *{box-sizing:border-box;}
+ *{box-sizing:border-box;}
   html{background:var(--paper);}
   body{margin:0;color:var(--ink);
     /* 画布：顶部略亮的竖向渐变让卡片"浮"起来；极淡网格给质感但不抢数据 */
     background:
-      linear-gradient(180deg,var(--paper-top) 0,var(--paper) 320px) no-repeat,
-      repeating-linear-gradient(0deg,transparent 0 31px,rgba(51,63,61,.02) 31px 32px),
-      repeating-linear-gradient(90deg,transparent 0 31px,rgba(51,63,61,.02) 31px 32px),
+      linear-gradient(180deg,var(--paper-top) 0,var(--paper) 340px) no-repeat,
+      repeating-linear-gradient(0deg,transparent 0 31px,rgba(15,23,42,.022) 31px 32px),
+      repeating-linear-gradient(90deg,transparent 0 31px,rgba(15,23,42,.022) 31px 32px),
       var(--paper);
     font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}
   /* 顶部品牌条：页面级强调色，3px */
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:50;
-    background:linear-gradient(90deg,var(--brand) 0,var(--teal) 45%,var(--blue) 100%);}
+    background:linear-gradient(90deg,var(--brand) 0,var(--c1) 50%,var(--c3) 100%);}
   .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
   /* 数据新鲜度：圆点 = 状态指示（非文字 UI，对卡片白 ≥3:1）*/
   .fresh{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
-  .fresh i{width:7px;height:7px;border-radius:50%;background:var(--teal);flex:0 0 auto;}
-  .fresh.warn i{background:var(--amber);}
-  .fresh.stale i{background:var(--rust);}
+  .fresh i{width:7px;height:7px;border-radius:50%;background:var(--c1);flex:0 0 auto;}
+  .fresh.warn i{background:var(--warn);}
+  .fresh.stale i{background:var(--danger);}
   /* 表格行 hover：扫读定位用。按标准"几十次/天"档 → 不做过渡动画，只给静态反馈；
      并用 @media (hover:hover) 门控，避免触屏上"粘住" */
   @media (hover:hover){ tbody tr:hover td{background:var(--brand-soft);} }
@@ -61,7 +64,7 @@
   .lang button{font:inherit;font-size:11.5px;line-height:1;padding:6px 12px;border:0;background:transparent;
     color:var(--ink-soft);cursor:pointer;letter-spacing:.3px;}
   .lang button + button{border-left:1px solid var(--hair);}
-  .lang button:hover{background:var(--teal-soft);color:var(--teal-ink);}
+  .lang button:hover{background:var(--c1-soft);color:var(--c1-ink);}
   .lang button.on{background:var(--brand);color:#fff;font-weight:600;}
   /* 焦点可见（WCAG 2.2 focus-appearance） */
   :focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:2px;}
@@ -75,24 +78,24 @@
   .kpi-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:22px;}
   @media (max-width:1080px){.kpi-strip{grid-template-columns:repeat(3,minmax(0,1fr));}}
   @media (max-width:620px){.kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr));}}
-  .kpi{background:var(--card);border:1px solid var(--hair);border-top:3px solid var(--teal);
+  .kpi{background:var(--card);border:1px solid var(--hair);border-top:3px solid var(--c1);
     border-radius:var(--radius-sm);padding:12px 13px 13px;position:relative;box-shadow:var(--shadow-card);}
-  .kpi.warn{border-top-color:var(--amber);}
-  .kpi.risk{border-top-color:var(--rust);}
+  .kpi.warn{border-top-color:var(--warn);}
+  .kpi.risk{border-top-color:var(--danger);}
   .kpi.muted{border-top-color:var(--ink-soft);}
   .kpi .k-label{font-size:10.5px;color:var(--ink-soft);letter-spacing:.3px;text-transform:uppercase;line-height:1.35;}
   .kpi .k-val{font-size:26px;font-weight:600;line-height:1.15;margin-top:5px;}
   .kpi .k-sub{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.4;}
   /* 重点指标高亮 */
-  .kpi.emph{border-top-width:4px;border-top-color:var(--rust);
-    background:linear-gradient(180deg,var(--rust-soft) 0%,var(--card) 62%);}
-  .kpi.emph2{border-top-width:4px;border-top-color:var(--amber);
-    background:linear-gradient(180deg,var(--amber-soft) 0%,var(--card) 62%);}
+  .kpi.emph{border-top-width:4px;border-top-color:var(--danger);
+    background:linear-gradient(180deg,var(--danger-soft) 0%,var(--card) 62%);}
+  .kpi.emph2{border-top-width:4px;border-top-color:var(--warn);
+    background:linear-gradient(180deg,var(--warn-soft) 0%,var(--card) 62%);}
   .kpi .badge{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9px;
-    background:var(--rust);color:#fff;margin-left:7px;vertical-align:3px;letter-spacing:.3px;}
-  .kpi .badge.sand{background:var(--amber);}
-  tr.hot td{background:var(--amber-soft);font-weight:600;}
-  tr.hot td:first-child{border-left:3px solid var(--amber);padding-left:9px;}
+    background:var(--danger);color:#fff;margin-left:7px;vertical-align:3px;letter-spacing:.3px;}
+  .kpi .badge.sand{background:var(--warn);}
+  tr.hot td{background:var(--warn-soft);font-weight:600;}
+  tr.hot td:first-child{border-left:3px solid var(--warn);padding-left:9px;}
 
   /* ---- 宽屏仪表盘：左右双栏，一屏装下 ---- */
   .dash{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:14px;align-items:start;}
@@ -150,47 +153,47 @@
   .card .sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;}
 
   /* ---- 分层 / 账龄：紧凑堆叠条 + 两行单元格 ---- */
-  .blk + .blk{margin-top:12px;padding-top:11px;border-top:1px dashed var(--hair);}
+  .blk + .blk{margin-top:12px;padding-top:11px;border-top:1px dashed var(--hair-soft);}
   .blk-name{font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.4px;margin-bottom:5px;}
   .stack{display:flex;height:21px;border:1px solid var(--hair);border-radius:3px;overflow:hidden;margin-bottom:9px;}
   /* 段内文字用深色（对中等明度填充 ≥5:1）；每段纹样角度不同，不靠颜色也能区分（色盲友好） */
   .stack .seg{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;
-    color:#131A18;min-width:2px;white-space:nowrap;overflow:hidden;}
-  .stack .seg.s1{background-color:var(--teal);
+    color:#FFFFFF;min-width:2px;white-space:nowrap;overflow:hidden;}
+  .stack .seg.s1{background-color:var(--c1);
     background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
-  .stack .seg.s2{background-color:var(--amber);
+  .stack .seg.s2{background-color:var(--warn);
     background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
-  .stack .seg.s3{background-color:var(--rust);
+  .stack .seg.s3{background-color:var(--danger);
     background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
-  .stack .seg.s4{background-color:var(--moss);
+  .stack .seg.s4{background-color:var(--c2);
     background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
-  .stack .seg.g1{background-color:var(--rust);
+  .stack .seg.g1{background-color:var(--danger);
     background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
-  .stack .seg.g2{background-color:var(--amber);
+  .stack .seg.g2{background-color:var(--warn);
     background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
-  .stack .seg.g3{background-color:var(--blue);
+  .stack .seg.g3{background-color:var(--c3);
     background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
   .tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
   .age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-  .tier-cell,.age-cell{border:1px solid var(--hair);border-left:4px solid var(--teal);
+  .tier-cell,.age-cell{border:1px solid var(--hair);border-left:4px solid var(--c1);
     border-radius:var(--radius-sm);padding:var(--sp-2) 11px;background:var(--panel);}
-  .tier-cell.c2{border-left-color:var(--amber);}
-  .tier-cell.c3{border-left-color:var(--rust);}
-  .tier-cell.c4{border-left-color:var(--moss);}
-  .age-cell{border-left:1px solid var(--hair);border-top:4px solid var(--rust);}
-  .age-cell.a2{border-top-color:var(--amber);}
-  .age-cell.a3{border-top-color:var(--blue);}
-  .age-cell.hot{border:1px solid var(--rust);border-top:5px solid var(--rust);
-    background:linear-gradient(180deg,var(--rust-soft) 0%,var(--panel) 62%);}
+  .tier-cell.c2{border-left-color:var(--warn);}
+  .tier-cell.c3{border-left-color:var(--danger);}
+  .tier-cell.c4{border-left-color:var(--c2);}
+  .age-cell{border-left:1px solid var(--hair);border-top:4px solid var(--danger);}
+  .age-cell.a2{border-top-color:var(--warn);}
+  .age-cell.a3{border-top-color:var(--c3);}
+  .age-cell.hot{border:1px solid var(--danger);border-top:5px solid var(--danger);
+    background:linear-gradient(180deg,var(--danger-soft) 0%,var(--panel) 62%);}
   .tier-cell .t-name,.age-cell .a-name{display:flex;align-items:baseline;gap:7px;
     font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;line-height:1.3;}
   .tier-cell .t-val,.age-cell .a-val{font-size:22px;font-weight:600;color:var(--ink);}
   .age-cell.hot .a-val{font-size:25px;}
   .tier-cell .t-meta,.age-cell .a-meta{font-size:10.5px;color:var(--ink-soft);margin-top:3px;line-height:1.45;}
-  .tier-cell .t-meta.warn,.age-cell .a-meta.warn{color:var(--amber-ink);}
-  .tier-cell .t-meta.risk,.age-cell .a-meta.risk{color:var(--rust-ink);}
+  .tier-cell .t-meta.warn,.age-cell .a-meta.warn{color:var(--warn-ink);}
+  .tier-cell .t-meta.risk,.age-cell .a-meta.risk{color:var(--danger-ink);}
   .age-cell .a-flag{display:inline-block;font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:8px;
-    background:var(--rust);color:#fff;vertical-align:1px;}
+    background:var(--danger);color:#fff;vertical-align:1px;}
   @media (max-width:820px){.tier-grid{grid-template-columns:repeat(2,1fr);}.age-grid{grid-template-columns:1fr;}}
 
   /* ---- 表格 ---- */
@@ -198,12 +201,12 @@
   th{text-align:right;font-weight:600;font-size:10.5px;color:var(--ink-soft);letter-spacing:.4px;
     text-transform:uppercase;border-bottom:1px solid var(--ink);padding:0 0 7px;}
   th:first-child{text-align:left;}
-  td{text-align:right;padding:7px 0;border-bottom:1px solid var(--hair);}
+  td{text-align:right;padding:7px 0;border-bottom:1px solid var(--hair-soft);}
   td:first-child{text-align:left;font-weight:500;}
   tr.total td{border-top:1px solid var(--ink);border-bottom:none;font-weight:600;}
-  .up{color:var(--rust-ink);} .down{color:var(--moss-ink);} .flat{color:var(--ink-soft);}
-  .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;background:var(--teal-soft);color:var(--teal-ink);}
-  .note{font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--hair);padding-top:7px;margin-top:8px;line-height:1.45;}
+  .up{color:var(--danger-ink);} .down{color:var(--ok);} .flat{color:var(--ink-soft);}
+  .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;background:var(--c1-soft);color:var(--c1-ink);}
+  .note{font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--hair-soft);padding-top:7px;margin-top:8px;line-height:1.45;}
 
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
   .two-col .card{margin-bottom:14px;display:flex;flex-direction:column;}
@@ -213,9 +216,9 @@
   /* ---- Trengo / DA WA ---- */
   .tre-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
   .tre-cell{border:1px solid var(--hair);background:var(--panel);border-radius:var(--radius-sm);
-    padding:var(--sp-3) var(--sp-4);border-top:4px solid var(--amber);}
-  .tre-cell.k-work{border-top-color:var(--blue);}
-  .tre-cell.k-done{border-top-color:var(--teal);}
+    padding:var(--sp-3) var(--sp-4);border-top:4px solid var(--warn);}
+  .tre-cell.k-work{border-top-color:var(--c3);}
+  .tre-cell.k-done{border-top-color:var(--c1);}
   .tre-cell .tre-name{font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;}
   .tre-cell .tre-val{font-size:30px;font-weight:600;line-height:1.15;margin-top:6px;}
   .tre-cell .tre-sub{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
@@ -227,23 +230,23 @@
   .q-row .q-name{font-size:12px;font-weight:600;}
   .q-bar{display:flex;height:19px;border:1px solid var(--hair);overflow:hidden;}
   .q-bar .seg{min-width:1px;}
-  .q-bar .answered{background:var(--teal);}
-  .q-bar .abandoned{background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 4px,var(--amber-soft) 4px,var(--amber-soft) 8px);}
+  .q-bar .answered{background:var(--c1);}
+  .q-bar .abandoned{background:repeating-linear-gradient(135deg,var(--warn),var(--warn) 4px,var(--warn-soft) 4px,var(--warn-soft) 8px);}
   .q-bar .rest{background:#E6E9E7;}
   .q-stats{font-size:11.5px;color:var(--ink-soft);display:flex;align-items:baseline;gap:10px;justify-content:flex-end;}
   .q-stats b{color:var(--ink);font-family:'IBM Plex Mono',monospace;}
   /* 接起率重点显示 */
   .q-stats .rate{font-size:12.5px;font-weight:700;color:var(--ink);}
-  .q-stats .rate b{font-size:16px;font-weight:700;color:var(--teal-ink);letter-spacing:-.4px;}
-  .q-stats .rate.low b{color:var(--rust-ink);}
-  .q-stats .rate.mid b{color:var(--amber-ink);}
+  .q-stats .rate b{font-size:16px;font-weight:700;color:var(--c1-ink);letter-spacing:-.4px;}
+  .q-stats .rate.low b{color:var(--danger-ink);}
+  .q-stats .rate.mid b{color:var(--warn-ink);}
   .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;}
   .legend i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--hair);}
-  .legend .l-ans{background:var(--teal);}
-  .legend .l-ab{background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 3px,var(--amber-soft) 3px,var(--amber-soft) 6px);}
+  .legend .l-ans{background:var(--c1);}
+  .legend .l-ab{background:repeating-linear-gradient(135deg,var(--warn),var(--warn) 3px,var(--warn-soft) 3px,var(--warn-soft) 6px);}
   .legend .l-rest{background:#E6E9E7;}
 
-  footer{border-top:1px solid var(--hair);padding-top:12px;margin-top:18px;font-size:11.5px;color:var(--ink-soft);line-height:1.65;}
+  footer{border-top:1px solid var(--hair-soft);padding-top:12px;margin-top:18px;font-size:11.5px;color:var(--ink-soft);line-height:1.65;}
 </style>
 </head>
 <body>
@@ -317,27 +320,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789569691378);
+const PULLED = new Date(0);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2532,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":83,"德语区(DE/AT)|L4":26};
-const noAction = {"德语区(DE/AT)|L1":431,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":432,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":155,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
-const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
-const closedThis = {"德语区(DE/AT)|L1":183,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":299,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
-const ageAll = {"德语区(DE/AT)|>3m":325,"德语区(DE/AT)|1-3m":956,"德语区(DE/AT)|<1m":1427};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":231,"德语区(DE/AT)|<1m":978};
-const weekStart = new Date(1789336800000);
-const trengoNew = 1;            // DA WA 新单待分派
-const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 25;       // DA WA 处理中
-const trengoClosedThis = 134;     // DA WA 本周已处理
-const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789569691378);
+const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
+const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const weekStart = new Date(0);
+const trengoNew = 0;            // DA WA 新单待分派
+const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 0;       // DA WA 处理中
+const trengoClosedThis = 0;     // DA WA 本周已处理
+const trengoClosedLast = 0;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(0);
 
 /* ========== 双语词典 ========== */
 const I18N = {
