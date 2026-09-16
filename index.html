@@ -8,33 +8,35 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* ===== 现代色板（2026-09 换新）· 依据 ui-ux-design skill：冷调中性底 + 靛蓝强调 + 高对比数据色 =====
-       规则：文字色一律 ≥4.5:1；数据填充 ≥3:1（且白字对其 ≥4.5:1）；边框可见性 ≥1.5:1 —— 全部逐项算过 */
-    --paper:#F6F8FA; --paper-top:#FFFFFF; --panel:#F8FAFC; --card:#FFFFFF;
-    --ink:#0F172A; --ink-soft:#5A6675;
-    --hair:#C3CEDA;        /* 结构边框（卡片/输入/条）*/
-    --hair-soft:#E5EAF0;   /* 行分隔、虚线分区 */
-    --brand:#4F46E5; --brand-soft:#EEF2FF; --brand-line:#D6DBFB;   /* 靛蓝：UI 强调/焦点/选中 */
-    --c1:#2563EB; --c1-soft:#EFF6FF; --c1-ink:#1D4ED8;            /* L1 / 数据主色 */
-    --c2:#7C3AED; --c2-soft:#F5F3FF; --c2-ink:#6D28D9;            /* L2 */
-    --c3:#0E7490; --c3-soft:#ECFEFF; --c3-ink:#155E75;            /* L3 */
-    --c4:#475569; --c4-soft:#F1F5F9; --c4-ink:#334155;            /* L4 */
+    /* ===== 配色（2026-09 定稿 v2）：暖白画布 + 暖族中性色 + 深冷强调 =====
+       协调要点：① 中性色（底/字/边框/阴影）全部走暖族 stone，不留冷灰；
+       ② 强调与数据色压深一档（-600 → -700），在米色上读作"墨"而非"贴纸"；
+       ③ 卡片阴影带暖（rgba(41,32,20,…)），暖底上的冷阴影会发脏。
+       对比度：文字 ≥4.5:1（最低 4.84）、填充+白字 ≥4.5:1（最低 5.02）、结构边框 1.67:1 —— 逐项算过 */
+    --paper:#FBF8F1; --paper-top:#FFFDF9; --panel:#FAF6EE; --card:#FFFFFF;
+    --ink:#1C1917; --ink-soft:#57534E;
+    --hair:#CFC7BC;        /* 结构边框（卡片/条/输入）*/
+    --hair-soft:#EBE4DA;   /* 行分隔、虚线分区 */
+    --brand:#4338CA; --brand-soft:#EDECFB; --brand-line:#D5D3F5;   /* 深靛蓝：UI 强调/焦点/选中 */
+    --c1:#1D4ED8; --c1-soft:#EFF6FF; --c1-ink:#1E40AF;            /* L1 / 数据主色 */
+    --c2:#6D28D9; --c2-soft:#F5F3FF; --c2-ink:#5B21B6;            /* L2 */
+    --c3:#0F766E; --c3-soft:#ECFDF5; --c3-ink:#115E59;            /* L3 */
+    --c4:#57534E; --c4-soft:#F5F5F4; --c4-ink:#44403C;            /* L4（暖中性，与画布同族）*/
     --ok:#047857; --ok-soft:#ECFDF5;                              /* 正向 / 接起 */
     --warn:#B45309; --warn-soft:#FFFBEB; --warn-ink:#B45309;      /* 警告 / 1–3 月 */
-    --danger:#DC2626; --danger-soft:#FEF2F2; --danger-ink:#C81E1E;/* 危险 / >3 月 */
+    --danger:#B91C1C; --danger-soft:#FEF2F2; --danger-ink:#C81E1E;/* 危险 / >3 月 */
     --ease-out:cubic-bezier(0.23,1,0.32,1);
     --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
     --radius:6px; --radius-sm:4px;
-    --shadow-card:0 1px 2px rgba(15,23,42,.06), 0 1px 8px rgba(15,23,42,.04);
-  }
- *{box-sizing:border-box;}
+    --shadow-card:0 1px 2px rgba(41,32,20,.06), 0 1px 8px rgba(41,32,20,.045);
+  }*{box-sizing:border-box;}
   html{background:var(--paper);}
   body{margin:0;color:var(--ink);
     /* 画布：顶部略亮的竖向渐变让卡片"浮"起来；极淡网格给质感但不抢数据 */
     background:
-      linear-gradient(180deg,var(--paper-top) 0,var(--paper) 340px) no-repeat,
-      repeating-linear-gradient(0deg,transparent 0 31px,rgba(15,23,42,.022) 31px 32px),
-      repeating-linear-gradient(90deg,transparent 0 31px,rgba(15,23,42,.022) 31px 32px),
+      linear-gradient(180deg,#FFFDF9 0,#FBF6EC 380px,#FBF8F1 100%) no-repeat,
+      repeating-linear-gradient(0deg,transparent 0 31px,rgba(120,85,10,.028) 31px 32px),
+      repeating-linear-gradient(90deg,transparent 0 31px,rgba(120,85,10,.028) 31px 32px),
       var(--paper);
     font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}
   /* 顶部品牌条：页面级强调色，3px */
@@ -232,7 +234,7 @@
   .q-bar .seg{min-width:1px;}
   .q-bar .answered{background:var(--c1);}
   .q-bar .abandoned{background:repeating-linear-gradient(135deg,var(--warn),var(--warn) 4px,var(--warn-soft) 4px,var(--warn-soft) 8px);}
-  .q-bar .rest{background:#E6E9E7;}
+  .q-bar .rest{background:#E8E2D7;}
   .q-stats{font-size:11.5px;color:var(--ink-soft);display:flex;align-items:baseline;gap:10px;justify-content:flex-end;}
   .q-stats b{color:var(--ink);font-family:'IBM Plex Mono',monospace;}
   /* 接起率重点显示 */
@@ -244,7 +246,7 @@
   .legend i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--hair);}
   .legend .l-ans{background:var(--c1);}
   .legend .l-ab{background:repeating-linear-gradient(135deg,var(--warn),var(--warn) 3px,var(--warn-soft) 3px,var(--warn-soft) 6px);}
-  .legend .l-rest{background:#E6E9E7;}
+  .legend .l-rest{background:#E8E2D7;}
 
   footer{border-top:1px solid var(--hair-soft);padding-top:12px;margin-top:18px;font-size:11.5px;color:var(--ink-soft);line-height:1.65;}
 </style>
@@ -320,27 +322,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789570225131);
+const PULLED = new Date(0);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2532,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":83,"德语区(DE/AT)|L4":26};
-const noAction = {"德语区(DE/AT)|L1":428,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":432,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":156,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":10};
-const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4};
-const closedThis = {"德语区(DE/AT)|L1":184,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":299,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
-const ageAll = {"德语区(DE/AT)|>3m":325,"德语区(DE/AT)|1-3m":955,"德语区(DE/AT)|<1m":1428};
-const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":230,"德语区(DE/AT)|<1m":978};
-const weekStart = new Date(1789336800000);
-const trengoNew = 1;            // DA WA 新单待分派
-const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 25;       // DA WA 处理中
-const trengoClosedThis = 134;     // DA WA 本周已处理
-const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789570225131);
+const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
+const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
+const weekStart = new Date(0);
+const trengoNew = 0;            // DA WA 新单待分派
+const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 0;       // DA WA 处理中
+const trengoClosedThis = 0;     // DA WA 本周已处理
+const trengoClosedLast = 0;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(0);
 
 /* ========== 双语词典 ========== */
 const I18N = {
