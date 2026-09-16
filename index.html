@@ -139,7 +139,7 @@
 
   <section>
     <h2>Hotline 情况</h2>
-    <div class="sub">数据来源 Genesys Cloud（voice queue），ROE 暂未配置电话队列</div>
+    <div class="sub">数据来源 Genesys Cloud（voice queue）</div>
     <div id="hotlineBars"></div>
   </section>
 
@@ -149,7 +149,7 @@
 </div>
 
 <script>
-const PULLED = new Date(1789550465289);
+const PULLED = new Date(1789550532161);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -262,14 +262,6 @@ const hotlineQueues = {
     {name:"GER-On-Site", offer:6, answer:4, abandon:2},
     {name:"GER_End_User", offer:133, answer:10, abandon:58},
     {name:"GER_Installer", offer:4, answer:4, abandon:0},
-  ],
-  "荷比卢": [
-    {name:"BEL_End_User", offer:9, answer:6, abandon:2},
-    {name:"BEL_Field_Service", offer:12, answer:6, abandon:6},
-    {name:"BEL_Installer", offer:4, answer:4, abandon:0},
-    {name:"NLD_End_User", offer:19, answer:5, abandon:9},
-    {name:"NLD_Field_Service", offer:17, answer:13, abandon:4},
-    {name:"NLD_Installer", offer:17, answer:16, abandon:1},
   ],
 };
 const hotlineBars = document.getElementById('hotlineBars');
