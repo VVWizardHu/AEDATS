@@ -8,16 +8,34 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* 配色：柔和低饱和（祥和感）+ 对比度按 WCAG 校验（2026-09，见 ui-ux-design skill）
-       ink-soft ≥4.5:1；填充色对卡片白 ≥3:1；-ink 变体专供「文字」（对浅底 ≥4.5:1） */
-    --paper:#F4F6F4; --panel:#FAFBFA; --card:#FFFFFF; --ink:#333F3D; --ink-soft:#687270;
-    --hair:#D8DEDA; --teal:#6A9C94; --teal-soft:#E4EEEC; --amber:#B08B58; --amber-soft:#F7EDDD;
+    /* ===== 设计 token（依据 ui-ux-design skill：看板 = Data-Dense Dashboard）=====
+       配色：柔和低饱和（祥和）+ WCAG 校验过的对比度
+         · 文字一律用 *-ink 变体（对浅底 ≥4.5:1）
+         · 图形填充 ≥3:1（对卡片白），并配不同角度纹样（色盲双编码）
+       间距：统一 4/8 栅格；看板用密集档 8–32px（不做营销页的大留白） */
+    --paper:#F2F5F3; --paper-top:#F7F9F8; --panel:#F8FAF9; --card:#FFFFFF;
+    --ink:#333F3D; --ink-soft:#687270; --hair:#D5DCD9;
+    --teal:#6A9C94; --teal-soft:#E4EEEC; --amber:#B08B58; --amber-soft:#F7EDDD;
     --rust:#C38672; --rust-soft:#F5E5DF; --moss:#958EAD; --blue:#7F94A3;
     --teal-ink:#4B716B; --amber-ink:#846741; --rust-ink:#885E50; --moss-ink:#6B6489;
+    --brand:#4B716B; --brand-soft:#E4EEEC; --brand-line:#CFDEDA;
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+    --radius:6px; --radius-sm:4px;
+    --shadow-card:0 1px 2px rgba(51,63,61,.05), 0 1px 8px rgba(51,63,61,.04);
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--paper);color:var(--ink);
+  html{background:var(--paper);}
+  body{margin:0;color:var(--ink);
+    /* 画布：顶部略亮的竖向渐变让卡片"浮"起来；极淡网格给质感但不抢数据 */
+    background:
+      linear-gradient(180deg,var(--paper-top) 0,var(--paper) 320px) no-repeat,
+      repeating-linear-gradient(0deg,transparent 0 31px,rgba(51,63,61,.02) 31px 32px),
+      repeating-linear-gradient(90deg,transparent 0 31px,rgba(51,63,61,.02) 31px 32px),
+      var(--paper);
     font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}
+  /* 顶部品牌条：页面级强调色，3px */
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:50;
+    background:linear-gradient(90deg,var(--brand) 0,var(--teal) 45%,var(--blue) 100%);}
   .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
   .wrap{max-width:1720px;margin:0 auto;padding:18px 24px 26px;}
@@ -35,14 +53,18 @@
     color:var(--ink-soft);cursor:pointer;letter-spacing:.3px;}
   .lang button + button{border-left:1px solid var(--hair);}
   .lang button:hover{background:var(--teal-soft);color:var(--teal-ink);}
-  .lang button.on{background:var(--teal);color:#fff;font-weight:600;}
+  .lang button.on{background:var(--brand);color:#fff;font-weight:600;}
+  /* 焦点可见（WCAG 2.2 focus-appearance） */
+  :focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:2px;}
+  /* 动效克制：仅颜色过渡，且尊重 reduced-motion */
+  @media (prefers-reduced-motion:no-preference){.lang button{transition:background-color .12s ease,color .12s ease;}}
 
   /* ---- KPI 卡 ---- */
   .kpi-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:22px;}
   @media (max-width:1080px){.kpi-strip{grid-template-columns:repeat(3,minmax(0,1fr));}}
   @media (max-width:620px){.kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr));}}
   .kpi{background:var(--card);border:1px solid var(--hair);border-top:3px solid var(--teal);
-    padding:12px 13px 13px;position:relative;}
+    border-radius:var(--radius-sm);padding:12px 13px 13px;position:relative;box-shadow:var(--shadow-card);}
   .kpi.warn{border-top-color:var(--amber);}
   .kpi.risk{border-top-color:var(--rust);}
   .kpi.muted{border-top-color:var(--ink-soft);}
@@ -71,41 +93,52 @@
   }
   /* 显示器高度不够时整体收紧，尽量一屏 */
   @media (max-height:960px){
-    .wrap{padding:12px 18px 16px;}
-    header{padding-bottom:9px;margin-bottom:11px;}
-    header h1{font-size:23px;}
-    header .period{font-size:12.5px;margin-top:4px;}
-    .kpi-strip{margin-bottom:12px;gap:9px;}
-    .kpi{padding:10px 12px 11px;}
-    .kpi .k-val{font-size:24px;}
+    .wrap{padding:10px 16px 12px;}
+    header{padding-bottom:7px;margin-bottom:9px;}
+    header h1{font-size:22px;}
+    header .period{font-size:12px;margin-top:3px;}
+    .kpi-strip{margin-bottom:10px;gap:8px;}
+    .kpi{padding:9px 11px 10px;}
+    .kpi .k-val{font-size:23px;}
     .kpi .k-label,.kpi .k-sub{font-size:10px;}
-    .card{padding:12px 14px 13px;}
+    .card{padding:11px 14px 12px;margin-bottom:11px;}
     .card h2{font-size:15px;}
-    .card .sub{font-size:11px;margin-bottom:8px;}
-    .stack{height:19px;margin-bottom:8px;}
-    .tier-cell,.age-cell,.tre-cell{padding:9px 11px;}
-    .tier-cell .t-val,.age-cell .a-val,.tre-cell .tre-val{font-size:21px;margin-top:2px;}
-    .age-cell.hot .a-val{font-size:24px;}
-    .tier-cell .t-na,.tier-cell .t-share,.age-cell .a-share,.age-cell .a-new,.tre-cell .tre-sub{font-size:10.5px;margin-top:2px;}
-    .age-cell .a-new{padding-top:6px;margin-top:7px;}
-    td{padding:5px 0;}
-    th{padding-bottom:5px;}
-    .q-row{margin-bottom:5px;}
-    .q-bar{height:16px;}
+    .card h2::before{height:13px;}
+    .card .sub{font-size:10.5px;margin-bottom:7px;}
+    .blk + .blk{margin-top:10px;padding-top:9px;}
+    .blk-name{font-size:10.5px;margin-bottom:4px;}
+    .stack{height:18px;margin-bottom:7px;}
+    .tier-cell,.age-cell{padding:7px 10px;}
+    .tier-cell .t-val,.age-cell .a-val{font-size:20px;margin-top:1px;}
+    .age-cell.hot .a-val{font-size:23px;}
+    .tier-cell .t-name,.age-cell .a-name,.tier-cell .t-meta,.age-cell .a-meta{font-size:10px;}
+    .tre-grid,.tier-grid,.age-grid{gap:9px;}
+    .tre-cell{padding:8px 11px;}
+    .tre-cell .tre-val{font-size:22px;}
+    .tre-cell .tre-sub{font-size:10px;margin-top:2px;}
+    table{font-size:12.5px;}
+    td{padding:4px 0;}
+    th{padding-bottom:4px;}
+    .q-row{margin-bottom:4px;}
+    .q-bar{height:15px;}
+    .q-stats{font-size:11px;}
     .q-stats .rate b{font-size:14px;}
-    .tre-cell .tre-val{font-size:24px;}
-    footer{padding-top:8px;margin-top:10px;font-size:11px;}
+    .legend{margin-bottom:7px;}
+    footer{padding-top:6px;margin-top:8px;font-size:10.5px;line-height:1.5;}
+  }
   }
 
-  .card{background:var(--card);border:1px solid var(--hair);padding:16px 18px 17px;margin-bottom:14px;
-    box-shadow:0 1px 2px rgba(51,63,61,.05);}
-  .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:16.5px;margin:0 0 2px;}
+  .card{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);
+    padding:var(--sp-4) 18px 17px;margin-bottom:14px;box-shadow:var(--shadow-card);}
+  .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:16.5px;margin:0 0 2px;
+    display:flex;align-items:center;gap:8px;}
+  .card h2::before{content:'';width:3px;height:15px;border-radius:2px;background:var(--brand);flex:0 0 auto;}
   .card .sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;}
 
   /* ---- 分层 / 账龄：紧凑堆叠条 + 两行单元格 ---- */
   .blk + .blk{margin-top:12px;padding-top:11px;border-top:1px dashed var(--hair);}
   .blk-name{font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.4px;margin-bottom:5px;}
-  .stack{display:flex;height:21px;border:1px solid var(--hair);overflow:hidden;margin-bottom:9px;}
+  .stack{display:flex;height:21px;border:1px solid var(--hair);border-radius:3px;overflow:hidden;margin-bottom:9px;}
   /* 段内文字用深色（对中等明度填充 ≥5:1）；每段纹样角度不同，不靠颜色也能区分（色盲友好） */
   .stack .seg{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;
     color:#131A18;min-width:2px;white-space:nowrap;overflow:hidden;}
@@ -126,7 +159,7 @@
   .tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
   .age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
   .tier-cell,.age-cell{border:1px solid var(--hair);border-left:4px solid var(--teal);
-    padding:8px 11px;background:var(--panel);}
+    border-radius:var(--radius-sm);padding:var(--sp-2) 11px;background:var(--panel);}
   .tier-cell.c2{border-left-color:var(--amber);}
   .tier-cell.c3{border-left-color:var(--rust);}
   .tier-cell.c4{border-left-color:var(--moss);}
@@ -165,7 +198,8 @@
 
   /* ---- Trengo / DA WA ---- */
   .tre-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-  .tre-cell{border:1px solid var(--hair);background:var(--panel);padding:14px 16px;border-top:4px solid var(--amber);}
+  .tre-cell{border:1px solid var(--hair);background:var(--panel);border-radius:var(--radius-sm);
+    padding:var(--sp-3) var(--sp-4);border-top:4px solid var(--amber);}
   .tre-cell.k-work{border-top-color:var(--blue);}
   .tre-cell.k-done{border-top-color:var(--teal);}
   .tre-cell .tre-name{font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;}
@@ -269,7 +303,7 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789568396339);
+const PULLED = new Date(1789568650283);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
@@ -289,7 +323,7 @@ const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
 const trengoAssigned = 26;       // DA WA 处理中
 const trengoClosedThis = 133;     // DA WA 本周已处理
 const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789568396339);
+const TRENGO_PULLED = new Date(1789568650283);
 
 /* ========== 双语词典 ========== */
 const I18N = {
