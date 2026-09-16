@@ -175,6 +175,19 @@
   <div class="kpi-strip" id="kpiRow"></div>
 
   <div class="card">
+    <h2 id="trengoTitle"></h2>
+    <div class="sub" id="trengoSub"></div>
+    <div class="tre-grid" id="treGrid"></div>
+  </div>
+
+  <div class="card">
+    <h2 id="hotlineTitle"></h2>
+    <div class="sub" id="hotlineSub"></div>
+    <div class="legend" id="hotlineLegend"></div>
+    <div id="hotlineBars"></div>
+  </div>
+
+  <div class="card">
     <h2 id="tierTitle"></h2>
     <div class="sub" id="tierSub"></div>
     <div class="stack" id="tierStack"></div>
@@ -203,26 +216,13 @@
     </div>
   </div>
 
-  <div class="card">
-    <h2 id="trengoTitle"></h2>
-    <div class="sub" id="trengoSub"></div>
-    <div class="tre-grid" id="treGrid"></div>
-  </div>
-
-  <div class="card">
-    <h2 id="hotlineTitle"></h2>
-    <div class="sub" id="hotlineSub"></div>
-    <div class="legend" id="hotlineLegend"></div>
-    <div id="hotlineBars"></div>
-  </div>
-
   <footer id="footNote"></footer>
 
 </div>
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1789566076233);
+const PULLED = new Date(1789566268186);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
@@ -242,7 +242,7 @@ const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
 const trengoAssigned = 25;       // DA WA 处理中
 const trengoClosedThis = 133;     // DA WA 本周已处理
 const trengoClosedLast = 254;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1789566076233);
+const TRENGO_PULLED = new Date(1789566268186);
 
 /* ========== 双语词典 ========== */
 const I18N = {
