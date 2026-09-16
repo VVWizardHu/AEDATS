@@ -39,15 +39,27 @@
   .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:17px;margin:0 0 3px;}
   .card .sub{font-size:12px;color:var(--ink-soft);margin-bottom:16px;}
 
-  /* ---- 分层条形 ---- */
-  .bar-row{display:grid;grid-template-columns:38px 1fr 84px 88px;align-items:center;gap:12px;margin-bottom:7px;}
-  .bar-row .tier{font-size:12px;font-weight:600;color:var(--ink-soft);}
-  .bar-track{height:22px;background:#F0F2F0;border:1px solid var(--hair);position:relative;overflow:hidden;}
-  .bar-fill{height:100%;background:var(--teal);}
-  .bar-fill.na{position:absolute;right:0;top:0;
-    background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 4px,var(--amber-soft) 4px,var(--amber-soft) 8px);}
-  .bar-row .v-main{font-size:13.5px;font-weight:600;text-align:right;}
-  .bar-row .v-sub{font-size:11.5px;color:var(--ink-soft);text-align:right;}
+  /* ---- 分层：堆叠占比条 + 数字块 ---- */
+  .stack{display:flex;height:26px;border:1px solid var(--hair);overflow:hidden;margin-bottom:16px;}
+  .stack .seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
+    color:#fff;min-width:2px;white-space:nowrap;overflow:hidden;}
+  .stack .seg.s1{background:var(--teal);}
+  .stack .seg.s2{background:var(--amber);}
+  .stack .seg.s3{background:var(--rust);}
+  .stack .seg.s4{background:var(--moss);}
+  .tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .tier-cell{border:1px solid var(--hair);border-left:4px solid var(--teal);padding:12px 14px;background:var(--panel);}
+  .tier-cell.c2{border-left-color:var(--amber);}
+  .tier-cell.c3{border-left-color:var(--rust);}
+  .tier-cell.c4{border-left-color:var(--moss);}
+  .tier-cell .t-name{font-size:11.5px;color:var(--ink-soft);letter-spacing:.4px;font-weight:600;}
+  .tier-cell .t-val{font-size:24px;font-weight:600;line-height:1.2;margin-top:4px;}
+  .tier-cell .t-share{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .tier-cell .t-na{font-size:11.5px;margin-top:8px;padding-top:7px;border-top:1px dashed var(--hair);}
+  .tier-cell .t-na b{font-family:'IBM Plex Mono',monospace;}
+  .tier-cell .t-na.warn{color:var(--amber);}
+  .tier-cell .t-na.risk{color:var(--rust);}
+  @media (max-width:820px){.tier-grid{grid-template-columns:repeat(2,1fr);}}
 
   /* ---- 表格 ---- */
   table{width:100%;border-collapse:collapse;font-size:13px;}
@@ -64,14 +76,20 @@
   @media (max-width:820px){.two-col{grid-template-columns:1fr;}}
 
   /* ---- Hotline ---- */
-  .q-row{display:grid;grid-template-columns:132px 1fr 232px;align-items:center;gap:12px;margin-bottom:8px;}
+  .q-row{display:grid;grid-template-columns:126px 1fr 236px;align-items:center;gap:14px;margin-bottom:9px;}
   .q-row .q-name{font-size:12px;font-weight:600;}
-  .q-track{height:20px;background:#F0F2F0;border:1px solid var(--hair);position:relative;overflow:hidden;}
-  .q-fill{height:100%;background:var(--teal);}
-  .q-abandon{position:absolute;right:0;top:0;height:100%;
-    background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 4px,var(--amber-soft) 4px,var(--amber-soft) 8px);}
+  .q-bar{display:flex;height:20px;border:1px solid var(--hair);overflow:hidden;}
+  .q-bar .seg{min-width:1px;}
+  .q-bar .answered{background:var(--teal);}
+  .q-bar .abandoned{background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 4px,var(--amber-soft) 4px,var(--amber-soft) 8px);}
+  .q-bar .rest{background:#E6E9E7;}
   .q-stats{font-size:12px;color:var(--ink-soft);}
   .q-stats b{color:var(--ink);font-family:'IBM Plex Mono',monospace;}
+  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;}
+  .legend i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--hair);}
+  .legend .l-ans{background:var(--teal);}
+  .legend .l-ab{background:repeating-linear-gradient(135deg,var(--amber),var(--amber) 3px,var(--amber-soft) 3px,var(--amber-soft) 6px);}
+  .legend .l-rest{background:#E6E9E7;}
 
   footer{border-top:1px solid var(--hair);padding-top:14px;margin-top:26px;font-size:11.5px;color:var(--ink-soft);line-height:1.7;}
 </style>
@@ -91,8 +109,9 @@
 
   <div class="card">
     <h2>Ticket 存量 · 分层级</h2>
-    <div class="sub">条形长度 = 该层级占 DA 总存量的比例；斜纹部分为「无动作」（5 个工作日无更新）</div>
-    <div id="ticketBars"></div>
+    <div class="sub" id="tierSub"></div>
+    <div class="stack" id="tierStack"></div>
+    <div class="tier-grid" id="tierGrid"></div>
   </div>
 
   <div class="two-col">
@@ -110,7 +129,12 @@
 
   <div class="card">
     <h2>Hotline 情况</h2>
-    <div class="sub">数据来源 Genesys Cloud（voice queue）</div>
+    <div class="sub">数据来源 Genesys Cloud（voice queue）　·　条形＝各队列来电构成（按占比填满整行）</div>
+    <div class="legend">
+      <span><i class="l-ans"></i>接起</span>
+      <span><i class="l-ab"></i>放弃</span>
+      <span><i class="l-rest"></i>其他未接</span>
+    </div>
     <div id="hotlineBars"></div>
   </div>
 
@@ -121,7 +145,7 @@
 </div>
 
 <script>
-const PULLED = new Date(1789551502103);
+const PULLED = new Date(1789551823534);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -129,12 +153,12 @@ const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['发货','内部上门','服务商上门'];
 
-const stock = {"德语区(DE/AT)|L1":2554,"德语区(DE/AT)|L2":66,"德语区(DE/AT)|L3":100,"德语区(DE/AT)|L4":11};
+const stock = {"德语区(DE/AT)|L1":2551,"德语区(DE/AT)|L2":66,"德语区(DE/AT)|L3":100,"德语区(DE/AT)|L4":11};
 const noAction = {"德语区(DE/AT)|L1":437,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
 const onsite = {"德语区(DE/AT)|L1":550,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":416,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":141,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":1};
+const newThis = {"德语区(DE/AT)|L1":142,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":1};
 const newLast = {"德语区(DE/AT)|L1":396,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":1};
-const closedThis = {"德语区(DE/AT)|L1":155,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":9,"德语区(DE/AT)|L4":1};
+const closedThis = {"德语区(DE/AT)|L1":159,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":9,"德语区(DE/AT)|L4":1};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
 const woStock = {"德语区(DE/AT)|发货":293,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
 
@@ -179,30 +203,27 @@ document.getElementById('kpiRow').innerHTML = `
     <div class="k-sub">发货/内部/服务商　占 Ticket ${woPct.toFixed(1)}%</div>
   </div>`;
 
-// ---- Ticket 分层 ----
-let tRows = '';
-tiers.forEach(t=>{
+// ---- Ticket 分层：堆叠占比条 + 数字块 ----
+let segs = '', cells = '';
+tiers.forEach((t, i)=>{
   const s = stock[REG+'|'+t] || 0;
   const na = noAction[REG+'|'+t] || 0;
-  const pct = ticketTot ? (s / ticketTot * 100) : 0;
+  const share = ticketTot ? (s / ticketTot * 100) : 0;
   const naPctT = s ? (na / s * 100) : 0;
-  tRows += `
-    <div class="bar-row">
-      <div class="tier">${t}</div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${pct}%"><div class="bar-fill na" style="width:${naPctT}%"></div></div>
-      </div>
-      <div class="v-main num">${fmt(s)}</div>
-      <div class="v-sub num">无动作 ${fmt(na)}（${naPctT.toFixed(0)}%）</div>
+  segs += `<div class="seg s${i+1}" style="width:${share}%" title="${t} ${fmt(s)}">${share >= 5 ? t : ''}</div>`;
+  const naCls = naPctT >= 45 ? 'risk' : (naPctT >= 25 ? 'warn' : '');
+  cells += `
+    <div class="tier-cell c${i+1}">
+      <div class="t-name">${t}</div>
+      <div class="t-val num">${fmt(s)}</div>
+      <div class="t-share">占 DA 存量 ${share.toFixed(1)}%</div>
+      <div class="t-na ${naCls}">无动作 <b>${fmt(na)}</b>（${naPctT.toFixed(0)}%）</div>
     </div>`;
 });
-tRows += `<div class="bar-row" style="margin-top:12px;border-top:1px solid var(--ink);padding-top:10px;">
-    <div class="tier">合计</div>
-    <div class="bar-track" style="visibility:hidden"></div>
-    <div class="v-main num">${fmt(ticketTot)}</div>
-    <div class="v-sub num">无动作 ${fmt(naTot)}（${naPct}%）</div>
-  </div>`;
-document.getElementById('ticketBars').innerHTML = tRows;
+document.getElementById('tierStack').innerHTML = segs;
+document.getElementById('tierGrid').innerHTML = cells;
+document.getElementById('tierSub').textContent =
+  `合计 ${fmt(ticketTot)} · 其中无动作 ${fmt(naTot)}（${naPct}%）　｜　占比条 = 各层级构成`;
 
 // ---- 本周变化 ----
 function delta(cur, prev, goodWhenDown){
@@ -239,28 +260,34 @@ const queues = hotlineQueues[REG];
 if(!queues){
   hb.innerHTML = '<div class="sub">暂无队列数据</div>';
 } else {
-  const maxOffer = Math.max(...queues.map(q=>q.offer));
   const tOffer = queues.reduce((s,q)=>s+q.offer,0);
   const tAns = queues.reduce((s,q)=>s+q.answer,0);
   const tAb = queues.reduce((s,q)=>s+q.abandon,0);
+  function bar(q){
+    const aPct = q.offer ? q.answer / q.offer * 100 : 0;
+    const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
+    const restPct = Math.max(0, 100 - aPct - abPct);
+    return `<div class="q-bar">
+        <div class="seg answered" style="width:${aPct}%"></div>
+        <div class="seg abandoned" style="width:${abPct}%"></div>
+        <div class="seg rest" style="width:${restPct}%"></div>
+      </div>`;
+  }
   let rows = '';
   queues.forEach(q=>{
-    const w = q.offer / maxOffer * 100;
     const aPct = q.offer ? q.answer / q.offer * 100 : 0;
     const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
     rows += `
       <div class="q-row">
         <div class="q-name">${q.name}</div>
-        <div class="q-track">
-          <div class="q-fill" style="width:${w}%"><div class="q-abandon" style="width:${abPct}%"></div></div>
-        </div>
+        ${bar(q)}
         <div class="q-stats">来电 <b>${q.offer}</b>　接起率 <b>${aPct.toFixed(0)}%</b>　放弃率 <b class="${abPct>=30?'up':''}">${abPct.toFixed(0)}%</b></div>
       </div>`;
   });
   rows += `
     <div class="q-row" style="margin-top:12px;border-top:1px solid var(--ink);padding-top:10px;">
       <div class="q-name">合计</div>
-      <div></div>
+      ${bar({offer:tOffer, answer:tAns, abandon:tAb})}
       <div class="q-stats">来电 <b>${tOffer}</b>　接起率 <b>${(tAns/tOffer*100).toFixed(1)}%</b>　放弃率 <b>${(tAb/tOffer*100).toFixed(1)}%</b></div>
     </div>`;
   hb.innerHTML = rows;
