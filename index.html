@@ -205,21 +205,21 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(0);
+const PULLED = new Date(1789560760468);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const noAction = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const onsite = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const newLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const closedThis = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const closedLast = {"德语区(DE/AT)|L1":0,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":0,"德语区(DE/AT)|L4":0};
-const woStock = {"德语区(DE/AT)|发货":0,"德语区(DE/AT)|内部上门":0,"德语区(DE/AT)|服务商上门":0};
-const ageAll = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
-const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":0,"德语区(DE/AT)|<1m":0};
-const weekStart = new Date(0);
+const stock = {"德语区(DE/AT)|L1":2543,"德语区(DE/AT)|L2":68,"德语区(DE/AT)|L3":100,"德语区(DE/AT)|L4":21};
+const noAction = {"德语区(DE/AT)|L1":436,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":27,"德语区(DE/AT)|L4":1};
+const onsite = {"德语区(DE/AT)|L1":549,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":416,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":146,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":7};
+const newLast = {"德语区(DE/AT)|L1":395,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":2};
+const closedThis = {"德语区(DE/AT)|L1":165,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":1};
+const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":290,"德语区(DE/AT)|内部上门":66,"德语区(DE/AT)|服务商上门":80};
+const ageAll = {"德语区(DE/AT)|>3m":328,"德语区(DE/AT)|1-3m":964,"德语区(DE/AT)|<1m":1440};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":237,"德语区(DE/AT)|<1m":998};
+const weekStart = new Date(1789336800000);
 
 /* ========== 双语词典 ========== */
 const I18N = {
@@ -251,33 +251,7 @@ const I18N = {
     hotlineSub:'数据来源 Genesys Cloud（voice queue）　·　条形＝各队列来电构成（按占比填满整行）',
     legAns:'接起', legAb:'放弃', legRest:'其他未接', legOther:'其他未接',
     qCalls:'来电', qRate:'接起率', qAbandon:'放弃率', qTotal:'合计',
-    foot:'Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）',
-    woTypeInternal:'内部上门', woTypeProvider:'服务商上门', woTypeShipping:'发货',
-  },
-  de: {
-    pageTitle:'DA Technischer Service – Tagesübersicht',
-    period:'Zeitraum {p}　·　Datenquelle: D365 CRM',
-    pulled:'Abgerufen',
-    kStock:'Ticket-Bestand', kStockSub:'Offene, unbearbeitete Fälle',
-    kOld:'Offen über 3 Monate', kOldSub:'{s} des Bestands · vorrangig bearbeiten', bOld:'Rückstand',
-    kNa:'Ohne Aktivität', kNaSub:'{n} Fälle · 5 Werktage ohne Update',
-    kNew:'Neu diese Woche', kNewSub:'Vorwoche {p} · Δ {d}',
-    kClosed:'Geschlossen diese Woche', kClosedSub:'Vorwoche {p} · Δ {d}',
-    kWO:'WO Innen-Onsite', kWOSub:'Offene Onsite-Aufträge des eigenen Teams', bOwn:'Eigenes Team',
-    tierTitle:'Ticket-Bestand · nach Ebene',
-    tierSub:'Gesamt {tot} · davon ohne Aktivität {na} ({pct} %)　|　Balken = Zusammensetzung nach Ebene',
-    tierShare:'Anteil am DA-Bestand {s}', tierNa:'ohne Aktivität',
-    ageTitle:'Fallalter · offen / neu & unbearbeitet',
-    ageSub:'Offen gesamt {tot} (nach Erstellungsdatum); davon „neu & unbearbeitet" (Status = Created) {nw}',
-    ageL1:'über 3 Monate', ageL2:'1 – 3 Monate', ageL3:'bis 1 Monat',
-    ageFlag:'priorisieren', ageShare:'{s} der offenen', ageNew:'neu & unbearbeitet', ageOf:'{s} der Gruppe',
-    deltaTitle:'Neu / Geschlossen diese Woche', deltaSub:'Δ = Vergleich mit der ganzen Vorwoche (rot = schlechter, grün = besser)',
-    deltaNote:'Schließdatum: alp_closedstatusupdatedon; Woche ab Montag 00:00',
-    thMetric:'Kennzahl', thThis:'Diese Woche', thLast:'Vorwoche', thDelta:'Δ',
-    rowNew:'Neue Tickets', rowClosed:'Geschlossene Tickets', rowNet:'Nettoveränderung',
-    woTitle:'Work-Order-Bestand · nach Typ', woSub:'Offene Aufträge, ohne versandte (Shipped)',
-    woOwn:'eigenes Team', woTotal:'Gesamt',
-    woNote:'<b>{n}</b> an Onsite-Tickets übergeben (separat gezählt, nicht im Ticket-Bestand)',
+    foot:'Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus<br>地区范围仅覆盖德语区(DE/AT)；存量＝Created + In Progress(Service)（不含已转上门工单）<b>{n}</b> an Onsite-Tickets übergeben (separat gezählt, nicht im Ticket-Bestand)',
     hotlineTitle:'Hotline-Übersicht',
     hotlineSub:'Quelle: Genesys Cloud (Voice Queue)　|　Balken = Zusammensetzung der Anrufe je Queue',
     legAns:'angenommen', legAb:'abgebrochen', legRest:'sonst. verpasst', legOther:'sonst. verpasst',
