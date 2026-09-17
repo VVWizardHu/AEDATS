@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DA 技术服务日常看板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ===== 配色（2026-09 定稿 v2）：暖白画布 + 暖族中性色 + 深冷强调 =====
+       协调要点：① 中性色（底/字/边框/阴影）全部走暖族 stone，不留冷灰；
+       ② 强调与数据色压深一档（-600 → -700），在米色上读作"墨"而非"贴纸"；
+       ③ 卡片阴影带暖（rgba(41,32,20,…)），暖底上的冷阴影会发脏。
+       对比度：文字 ≥4.5:1（最低 4.84）、填充+白字 ≥4.5:1（最低 5.02）、结构边框 1.67:1 —— 逐项算过 */
+    --paper:#FBF8F1; --paper-top:#FFFDF9; --panel:#FAF6EE; --card:#FFFFFF;
+    --ink:#1C1917; --ink-soft:#57534E;
+    --hair:#CFC7BC;        /* 结构边框（卡片/条/输入）*/
+    --hair-soft:#EBE4DA;   /* 行分隔、虚线分区 */
+    --brand:#4338CA; --brand-soft:#EDECFB; --brand-line:#D5D3F5;   /* 深靛蓝：UI 强调/焦点/选中 */
+    --c1:#1D4ED8; --c1-soft:#EFF6FF; --c1-ink:#1E40AF;            /* L1 / 数据主色 */
+    --c2:#6D28D9; --c2-soft:#F5F3FF; --c2-ink:#5B21B6;            /* L2 */
+    --c3:#0F766E; --c3-soft:#ECFDF5; --c3-ink:#115E59;            /* L3 */
+    --c4:#57534E; --c4-soft:#F5F5F4; --c4-ink:#44403C;            /* L4（暖中性，与画布同族）*/
+    --ok:#047857; --ok-soft:#ECFDF5;                              /* 正向 / 接起 */
+    --warn:#B45309; --warn-soft:#FFFBEB; --warn-ink:#B45309;      /* 警告 / 1–3 月 */
+    --danger:#B91C1C; --danger-soft:#FEF2F2; --danger-ink:#C81E1E;/* 危险 / >3 月 */
+    --ease-out:cubic-bezier(0.23,1,0.32,1);
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+    --radius:6px; --radius-sm:4px;
+    --shadow-card:0 1px 2px rgba(41,32,20,.06), 0 1px 8px rgba(41,32,20,.045);
+  }*{box-sizing:border-box;}
+  html{background:var(--paper);}
+  body{margin:0;color:var(--ink);
+    /* 画布：顶部略亮的竖向渐变让卡片"浮"起来；极淡网格给质感但不抢数据 */
+    background:
+      linear-gradient(180deg,#FFFDF9 0,#FBF6EC 380px,#FBF8F1 100%) no-repeat,
+      repeating-linear-gradient(0deg,transparent 0 31px,rgba(120,85,10,.028) 31px 32px),
+      repeating-linear-gradient(90deg,transparent 0 31px,rgba(120,85,10,.028) 31px 32px),
+      var(--paper);
+    font-family:'IBM Plex Sans',-apple-system,'PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}
+  /* 顶部品牌条：页面级强调色，3px */
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:50;
+    background:linear-gradient(90deg,var(--brand) 0,var(--c1) 50%,var(--c3) 100%);}
+  .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
+  /* 数据新鲜度：圆点 = 状态指示（非文字 UI，对卡片白 ≥3:1）*/
+  .fresh{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+  .fresh i{width:7px;height:7px;border-radius:50%;background:var(--c1);flex:0 0 auto;}
+  .fresh.warn i{background:var(--warn);}
+  .fresh.stale i{background:var(--danger);}
+  /* 表格行 hover：扫读定位用。按标准"几十次/天"档 → 不做过渡动画，只给静态反馈；
+     并用 @media (hover:hover) 门控，避免触屏上"粘住" */
+  @media (hover:hover){ tbody tr:hover td{background:var(--brand-soft);} }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+  .wrap{max-width:1720px;margin:0 auto;padding:18px 24px 26px;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:2px solid var(--ink);padding-bottom:13px;margin-bottom:16px;}
+  header h1{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:28px;margin:0;letter-spacing:.2px;}
+  header .period{font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
+  .hright{display:flex;align-items:center;gap:16px;}
+  header .pulled{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+  header .pulled .num{font-size:13px;color:var(--ink);margin-left:6px;letter-spacing:0;text-transform:none;}
+  /* 语言切换 */
+  .lang{display:inline-flex;border:1px solid var(--hair);background:var(--panel);border-radius:3px;overflow:hidden;}
+  .lang button{font:inherit;font-size:11.5px;line-height:1;padding:6px 12px;border:0;background:transparent;
+    color:var(--ink-soft);cursor:pointer;letter-spacing:.3px;}
+  .lang button + button{border-left:1px solid var(--hair);}
+  .lang button:hover{background:var(--c1-soft);color:var(--c1-ink);}
+  .lang button.on{background:var(--brand);color:#fff;font-weight:600;}
+  /* 焦点可见（WCAG 2.2 focus-appearance） */
+  :focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:2px;}
+  /* 动效克制：仅颜色过渡，且尊重 reduced-motion */
+  .lang button:active{transform:scale(0.97);}
+  @media (prefers-reduced-motion:no-preference){
+    .lang button{transition:background-color .12s ease,color .12s ease,transform .16s var(--ease-out);}
+  }
+
+  /* ---- KPI 卡 ---- */
+  .kpi-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:22px;}
+  @media (max-width:1080px){.kpi-strip{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  @media (max-width:620px){.kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  .kpi{background:var(--card);border:1px solid var(--hair);border-top:3px solid var(--c1);
+    border-radius:var(--radius-sm);padding:12px 13px 13px;position:relative;box-shadow:var(--shadow-card);}
+  .kpi.warn{border-top-color:var(--warn);}
+  .kpi.risk{border-top-color:var(--danger);}
+  .kpi.muted{border-top-color:var(--ink-soft);}
+  .kpi .k-label{font-size:10.5px;color:var(--ink-soft);letter-spacing:.3px;text-transform:uppercase;line-height:1.35;}
+  .kpi .k-val{font-size:26px;font-weight:600;line-height:1.15;margin-top:5px;}
+  .kpi .k-sub{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.4;}
+  /* 重点指标高亮 */
+  .kpi.emph{border-top-width:4px;border-top-color:var(--danger);
+    background:linear-gradient(180deg,var(--danger-soft) 0%,var(--card) 62%);}
+  .kpi.emph2{border-top-width:4px;border-top-color:var(--warn);
+    background:linear-gradient(180deg,var(--warn-soft) 0%,var(--card) 62%);}
+  .kpi .badge{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9px;
+    background:var(--danger);color:#fff;margin-left:7px;vertical-align:3px;letter-spacing:.3px;}
+  .kpi .badge.sand{background:var(--warn);}
+  tr.hot td{background:var(--warn-soft);font-weight:600;}
+  tr.hot td:first-child{border-left:3px solid var(--warn);padding-left:9px;}
+
+  /* ---- 宽屏仪表盘：左右双栏，一屏装下 ---- */
+  .dash{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:14px;align-items:start;}
+  .col-main,.col-side{display:flex;flex-direction:column;gap:14px;min-width:0;}
+  .dash .card{margin-bottom:0;}
+  .dash .two-col{gap:14px;margin:0;}
+  @media (max-width:1180px){
+    .dash{grid-template-columns:1fr;}
+    .col-side{order:-1;}          /* 窄屏时 Trengo / Hotline 仍在 Ticket 明细之前 */
+  }
+  /* 显示器高度不够时整体收紧，尽量一屏 */
+  @media (max-height:960px){
+    .wrap{padding:10px 16px 12px;}
+    header{padding-bottom:7px;margin-bottom:9px;}
+    header h1{font-size:21px;}
+    header .period{font-size:12px;margin-top:3px;}
+    .kpi-strip{margin-bottom:10px;gap:8px;}
+    .kpi{padding:9px 11px 10px;}
+    .kpi .k-val{font-size:23px;}
+    .kpi .k-label,.kpi .k-sub{font-size:10px;}
+    .kpi .k-sub{margin-top:2px;line-height:1.25;}
+    .kpi .k-val{margin-top:3px;}
+    .card{padding:11px 14px 12px;margin-bottom:11px;}
+    .card h2{font-size:15px;}
+    .card h2::before{height:13px;}
+    .card .sub{font-size:10.5px;margin-bottom:7px;}
+    .blk + .blk{margin-top:8px;padding-top:7px;}
+    .blk-name{font-size:10.5px;margin-bottom:4px;}
+    .stack{height:18px;margin-bottom:7px;}
+    .tier-cell,.age-cell{padding:7px 10px;}
+    .tier-cell .t-val,.age-cell .a-val{font-size:19px;margin-top:1px;}
+    .age-cell.hot .a-val{font-size:23px;}
+    .tier-cell .t-name,.age-cell .a-name,.tier-cell .t-meta,.age-cell .a-meta{font-size:10px;}
+    .tre-grid,.tier-grid,.age-grid{gap:9px;}
+    .tre-cell{padding:8px 11px;}
+    .tre-cell .tre-val{font-size:22px;}
+    .tre-cell .tre-sub{font-size:10px;margin-top:2px;}
+    table{font-size:12px;}
+    td{padding:2px 0;}
+    th{padding-bottom:4px;}
+    .q-row{margin-bottom:3px;}
+    .q-bar{height:14px;}
+    .q-stats{font-size:11px;}
+    .q-stats .rate b{font-size:14px;}
+    .legend{margin-bottom:7px;}
+    footer{padding-top:5px;margin-top:7px;font-size:10px;line-height:1.4;}
+  }
+  }
+
+  .card{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);
+    padding:var(--sp-4) 18px 17px;margin-bottom:14px;box-shadow:var(--shadow-card);}
+  .card h2{font-family:'IBM Plex Sans Condensed';font-weight:700;font-size:16.5px;margin:0 0 2px;
+    display:flex;align-items:center;gap:8px;}
+  .card h2::before{content:'';width:3px;height:15px;border-radius:2px;background:var(--brand);flex:0 0 auto;}
+  .card .sub{font-size:11.5px;color:var(--ink-soft);margin-bottom:12px;}
+
+  /* ---- 分层 / 账龄：紧凑堆叠条 + 两行单元格 ---- */
+  .blk + .blk{margin-top:12px;padding-top:11px;border-top:1px dashed var(--hair-soft);}
+  .blk-name{font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.4px;margin-bottom:5px;}
+  .stack{display:flex;height:21px;border:1px solid var(--hair);border-radius:3px;overflow:hidden;margin-bottom:9px;}
+  /* 段内文字用深色（对中等明度填充 ≥5:1）；每段纹样角度不同，不靠颜色也能区分（色盲友好） */
+  .stack .seg{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;
+    color:#FFFFFF;min-width:2px;white-space:nowrap;overflow:hidden;}
+  .stack .seg.s1{background-color:var(--c1);
+    background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
+  .stack .seg.s2{background-color:var(--warn);
+    background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
+  .stack .seg.s3{background-color:var(--danger);
+    background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
+  .stack .seg.s4{background-color:var(--c2);
+    background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
+  .stack .seg.g1{background-color:var(--danger);
+    background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
+  .stack .seg.g2{background-color:var(--warn);
+    background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
+  .stack .seg.g3{background-color:var(--c3);
+    background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 3px,transparent 3px 9px);}
+  .tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .tier-cell,.age-cell{border:1px solid var(--hair);border-left:4px solid var(--c1);
+    border-radius:var(--radius-sm);padding:var(--sp-2) 11px;background:var(--panel);}
+  .tier-cell.c2{border-left-color:var(--warn);}
+  .tier-cell.c3{border-left-color:var(--danger);}
+  .tier-cell.c4{border-left-color:var(--c2);}
+  .age-cell{border-left:1px solid var(--hair);border-top:4px solid var(--danger);}
+  .age-cell.a2{border-top-color:var(--warn);}
+  .age-cell.a3{border-top-color:var(--c3);}
+  .age-cell.hot{border:1px solid var(--danger);border-top:5px solid var(--danger);
+    background:linear-gradient(180deg,var(--danger-soft) 0%,var(--panel) 62%);}
+  .tier-cell .t-name,.age-cell .a-name{display:flex;align-items:baseline;gap:7px;
+    font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;line-height:1.3;}
+  .tier-cell .t-val,.age-cell .a-val{font-size:22px;font-weight:600;color:var(--ink);}
+  .age-cell.hot .a-val{font-size:25px;}
+  .tier-cell .t-meta,.age-cell .a-meta{font-size:10.5px;color:var(--ink-soft);margin-top:3px;line-height:1.45;}
+  .tier-cell .t-meta.warn,.age-cell .a-meta.warn{color:var(--warn-ink);}
+  .tier-cell .t-meta.risk,.age-cell .a-meta.risk{color:var(--danger-ink);}
+  .age-cell .a-flag{display:inline-block;font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:8px;
+    background:var(--danger);color:#fff;vertical-align:1px;}
+  @media (max-width:820px){.tier-grid{grid-template-columns:repeat(2,1fr);}.age-grid{grid-template-columns:1fr;}}
+
+  /* ---- 表格 ---- */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:right;font-weight:600;font-size:10.5px;color:var(--ink-soft);letter-spacing:.4px;
+    text-transform:uppercase;border-bottom:1px solid var(--ink);padding:0 0 7px;}
+  th:first-child{text-align:left;}
+  td{text-align:right;padding:7px 0;border-bottom:1px solid var(--hair-soft);}
+  td:first-child{text-align:left;font-weight:500;}
+  tr.total td{border-top:1px solid var(--ink);border-bottom:none;font-weight:600;}
+  .up{color:var(--danger-ink);} .down{color:var(--ok);} .flat{color:var(--ink-soft);}
+  .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;background:var(--c1-soft);color:var(--c1-ink);}
+  .note{font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--hair-soft);padding-top:7px;margin-top:8px;line-height:1.45;}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
+  .two-col .card{margin-bottom:14px;display:flex;flex-direction:column;}
+  .two-col .card .note{margin-top:auto;}
+  @media (max-width:820px){.two-col{grid-template-columns:1fr;}}
+
+  /* ---- Trengo / DA WA ---- */
+  .tre-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .tre-cell{border:1px solid var(--hair);background:var(--panel);border-radius:var(--radius-sm);
+    padding:var(--sp-3) var(--sp-4);border-top:4px solid var(--warn);}
+  .tre-cell.k-work{border-top-color:var(--c3);}
+  .tre-cell.k-done{border-top-color:var(--c1);}
+  .tre-cell .tre-name{font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;}
+  .tre-cell .tre-val{font-size:30px;font-weight:600;line-height:1.15;margin-top:6px;}
+  .tre-cell .tre-sub{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+  .tre-cell .tre-sub b{font-family:'IBM Plex Mono',monospace;color:var(--ink);}
+  @media (max-width:820px){.tre-grid{grid-template-columns:1fr;}}
+
+  /* ---- Hotline ---- */
+  .q-row{display:grid;grid-template-columns:132px 1fr 244px;align-items:center;gap:12px;margin-bottom:7px;}
+  .q-row .q-name{font-size:12px;font-weight:600;}
+  .q-bar{display:flex;height:19px;border:1px solid var(--hair);overflow:hidden;}
+  .q-bar .seg{min-width:1px;}
+  .q-bar .answered{background:var(--c1);}
+  .q-bar .abandoned{background:repeating-linear-gradient(135deg,var(--warn),var(--warn) 4px,var(--warn-soft) 4px,var(--warn-soft) 8px);}
+  .q-bar .rest{background:#E8E2D7;}
+  .q-stats{font-size:11.5px;color:var(--ink-soft);display:flex;align-items:baseline;gap:10px;justify-content:flex-end;}
+  .q-stats b{color:var(--ink);font-family:'IBM Plex Mono',monospace;}
+  /* 接起率重点显示 */
+  .q-stats .rate{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .q-stats .rate b{font-size:16px;font-weight:700;color:var(--c1-ink);letter-spacing:-.4px;}
+  .q-stats .rate.low b{color:var(--danger-ink);}
+  .q-stats .rate.mid b{color:var(--warn-ink);}
+  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;}
+  .legend i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--hair);}
+  .legend .l-ans{background:var(--c1);}
+  .legend .l-ab{background:repeating-linear-gradient(135deg,var(--warn),var(--warn) 3px,var(--warn-soft) 3px,var(--warn-soft) 6px);}
+  .legend .l-rest{background:#E8E2D7;}
+
+  footer{border-top:1px solid var(--hair-soft);padding-top:12px;margin-top:18px;font-size:11.5px;color:var(--ink-soft);line-height:1.65;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1 id="pageH1"></h1>
+      <div class="period" id="periodLine"></div>
+    </div>
+    <div class="hright">
+      <div class="lang" id="langSwitch">
+        <button type="button" data-lang="zh">中文</button>
+        <button type="button" data-lang="de">Deutsch</button>
+      </div>
+      <div class="pulled"><span id="pulledLabel"></span><span class="num" id="pulledTime"></span><span id="freshCRM"></span></div>
+    </div>
+  </header>
+
+  <div class="kpi-strip" id="kpiRow"></div>
+
+  <div class="dash">
+    <div class="col-main">
+        <div class="card">
+          <h2 id="tierTitle"></h2>
+          <div class="sub" id="tierSub"></div>
+          <div class="blk">
+            <div class="blk-name" id="tierBlkName"></div>
+            <div class="stack" id="tierStack" role="img"></div>
+            <div class="tier-grid" id="tierGrid"></div>
+          </div>
+          <div class="blk">
+            <div class="blk-name" id="ageBlkName"></div>
+            <div class="stack" id="ageStackAll" role="img"></div>
+            <div class="age-grid" id="ageGrid"></div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <h2 id="deltaTitle"></h2>
+            <div class="sub" id="deltaSub"></div>
+            <div class="tbl-fill"><table id="deltaTable"></table></div>
+            <div class="note" id="deltaNote"></div>
+          </div>
+          <div class="card">
+            <h2 id="woTitle"></h2>
+            <div class="sub" id="woSub"></div>
+            <div class="tbl-fill"><table id="woTable"></table></div>
+            <div class="note" id="woNote"></div>
+          </div>
+        </div>
+    </div>
+    <div class="col-side">
+        <div class="card">
+          <h2 id="trengoTitle"></h2>
+          <div class="sub" id="trengoSub"></div>
+          <div class="tre-grid" id="treGrid"></div>
+        </div>
+        <div class="card">
+          <h2 id="hotlineTitle"></h2>
+          <div class="sub" id="hotlineSub"></div>
+          <div class="legend" id="hotlineLegend"></div>
+          <div id="hotlineBars"></div>
+        </div>
+    </div>
+  </div>
+
+  <footer id="footNote"></footer>
+
+</div>
+
+<script>
+/* ========== 数据块（脚本自动替换，勿手改） ========== */
+const PULLED = new Date(1789632052177);
+const regions = ['德语区(DE/AT)'];
+const tiers = ['L1','L2','L3','L4'];
+const types = ['内部上门','服务商上门','发货'];
+const stock = {"德语区(DE/AT)|L1":2550,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":82,"德语区(DE/AT)|L4":6};
+const noAction = {"德语区(DE/AT)|L1":427,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1};
+const onsite = {"德语区(DE/AT)|L1":552,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":433,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":188,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":1};
+const newLast = {"德语区(DE/AT)|L1":396,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":1};
+const closedThis = {"德语区(DE/AT)|L1":206,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":11,"德语区(DE/AT)|L4":1};
+const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0};
+const woStock = {"德语区(DE/AT)|发货":300,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82};
+const ageAll = {"德语区(DE/AT)|>3m":326,"德语区(DE/AT)|1-3m":955,"德语区(DE/AT)|<1m":1424};
+const ageNew = {"德语区(DE/AT)|>3m":20,"德语区(DE/AT)|1-3m":238,"德语区(DE/AT)|<1m":977};
+const weekStart = new Date(1789336800000);
+const trengoNew = 1;            // DA WA 新单待分派
+const trengoOpen = 1;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 9;       // DA WA 处理中
+const trengoClosedThis = 165;     // DA WA 本周已处理
+const trengoClosedLast = 254;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(1789632052177);
+
+/* ========== 双语词典 ========== */
+const I18N = {
+  zh: {
+    pageTitle:'DA 技术服务日常看板',
+    period:'周期 {p}　·　数据来源 D365 CRM',
+    pulled:'拉取时间',
+    agoNow:'刚刚', agoMin:'{n} 分钟前', agoHr:'{n} 小时前', freshTitle:'数据新鲜度', autoRefresh:'· 每 5 分钟自动检查更新',
+    kStock:'Ticket 存量', kStockSub:'未关闭待处理客诉',
+    kOld:'超 3 个月未关闭', kOldSub:'占存量 {s} · 优先清理', bOld:'积压',
+    kNa:'无动作', kNaSub:'{n} 条 · 5 个工作日无更新',
+    kNew:'本周新增', kNewSub:'上周 {p} · 环比 {d}',
+    kClosed:'本周关闭', kClosedSub:'上周 {p} · 环比 {d}',
+    kWO:'WO 内部上门', kWOSub:'自有团队上门工单存量', bOwn:'自有团队',
+    tierTitle:'Ticket 存量结构 · 分层级与账龄',
+    tierBlk:'按客诉等级（L1–L4）', ageBlk:'按创建时间账龄（未关闭）',
+    tierSub:'合计 {tot} · 其中无动作 {na}（{pct}%）　｜　占比条 = 各层级构成',
+    tierShare:'占 DA 存量 {s}', tierNa:'无动作',
+    ageTitle:'客诉账龄 · 未关闭 / 新建未处理',
+    ageSub:'未关闭合计 {tot}（按创建时间分档）；其中「新建未处理」(状态=Created) {nw} 条',
+    ageL1:'超过 3 个月', ageL2:'1 – 3 个月', ageL3:'1 个月以内',
+    ageFlag:'优先清理', ageShare:'占未关闭 {s}', ageNew:'新建未处理', ageOf:'占本档 {s}',
+    deltaTitle:'本周新增 / 关闭', deltaSub:'环比 = 与上周整周比较（红＝恶化，绿＝改善）',
+    deltaNote:'关闭口径：alp_closedstatusupdatedon；本周＝本周一 00:00 起',
+    thMetric:'指标', thThis:'本周', thLast:'上周', thDelta:'环比',
+    rowNew:'新增 Ticket', rowClosed:'关闭 Ticket', rowNet:'净变化',
+    woTitle:'Work Order 存量 · 分类型', woSub:'未完成工单，剔除已发货(Shipped)',
+    woOwn:'自有团队', woTotal:'合计',
+    woNote:'已转上门工单 <b>{n}</b> 条单独统计，不计入 Ticket 存量',
+    hotlineTitle:'Hotline 情况',
+    hotlineSub:'数据来源 Genesys Cloud（voice queue）　·　条形＝各队列来电构成（按占比填满整行）',
+    treTitle:'Trengo · DA WA（WhatsApp 客服）',
+    treSub:'渠道「DA WA (+49 1522 3112326)」　·　数据来源 Trengo　·　拉取时间 {t}',
+    treWait:'新单待分派', treWaitSub:'未关闭且尚未分配处理人',
+    treWorking:'处理中', treWorkingSub:'已分配给客服，尚未关闭',
+    treDone:'本周已处理', treDoneSub:'上周 <b>{p}</b> · 环比 {d}',
+    legAns:'接起', legAb:'放弃', legRest:'其他未接', legOther:'其他未接',
+    qCalls:'来电', qRate:'接起率', qAbandon:'放弃率', qTotal:'合计',
+    foot:'口径：存量 = Created + In Progress(Service)（<b>不含</b>已转上门工单）　·　关闭以 alp_closedstatusupdatedon 为准　·　地区仅德语区(DE/AT)<br>字段：Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
+    woTypeInternal:'内部上门', woTypeProvider:'服务商上门', woTypeShipping:'发货',
+  },
+  de: {
+    pageTitle:'DA Technischer Service – Tagesübersicht',
+    period:'Zeitraum {p}　·　Datenquelle: D365 CRM',
+    pulled:'Abgerufen',
+    agoNow:'gerade eben', agoMin:'vor {n} Min.', agoHr:'vor {n} Std.', freshTitle:'Datenaktualität', autoRefresh:'· prüft alle 5 Min. automatisch',
+    kStock:'Ticket-Bestand', kStockSub:'Offene, unbearbeitete Fälle',
+    kOld:'Offen über 3 Monate', kOldSub:'{s} des Bestands · vorrangig bearbeiten', bOld:'Rückstand',
+    kNa:'Ohne Aktivität', kNaSub:'{n} Fälle · 5 Werktage ohne Update',
+    kNew:'Neu diese Woche', kNewSub:'Vorwoche {p} · Δ {d}',
+    kClosed:'Geschlossen diese Woche', kClosedSub:'Vorwoche {p} · Δ {d}',
+    kWO:'WO Innen-Onsite', kWOSub:'Offene Onsite-Aufträge des eigenen Teams', bOwn:'Eigenes Team',
+    tierTitle:'Ticket-Struktur · Ebene & Alter',
+    tierBlk:'nach Ebene (L1–L4)', ageBlk:'nach Alter (offen)',
+    tierSub:'Gesamt {tot} · davon ohne Aktivität {na} ({pct} %)　|　Balken = Zusammensetzung nach Ebene',
+    tierShare:'Anteil am DA-Bestand {s}', tierNa:'ohne Aktivität',
+    ageTitle:'Fallalter · offen / neu & unbearbeitet',
+    ageSub:'Offen gesamt {tot} (nach Erstellungsdatum); davon „neu & unbearbeitet" (Status = Created) {nw}',
+    ageL1:'über 3 Monate', ageL2:'1 – 3 Monate', ageL3:'bis 1 Monat',
+    ageFlag:'priorisieren', ageShare:'{s} der offenen', ageNew:'neu & unbearbeitet', ageOf:'{s} der Gruppe',
+    deltaTitle:'Neu / Geschlossen diese Woche', deltaSub:'Δ = Vergleich mit der ganzen Vorwoche (rot = schlechter, grün = besser)',
+    deltaNote:'Schließdatum: alp_closedstatusupdatedon; Woche ab Montag 00:00',
+    thMetric:'Kennzahl', thThis:'Diese Woche', thLast:'Vorwoche', thDelta:'Δ',
+    rowNew:'Neue Tickets', rowClosed:'Geschlossene Tickets', rowNet:'Nettoveränderung',
+    woTitle:'Work-Order-Bestand · nach Typ', woSub:'Offene Aufträge, ohne versandte (Shipped)',
+    woOwn:'eigenes Team', woTotal:'Gesamt',
+    woNote:'<b>{n}</b> an Onsite-Tickets übergeben (separat gezählt, nicht im Ticket-Bestand)',
+    hotlineTitle:'Hotline-Übersicht',
+    hotlineSub:'Quelle: Genesys Cloud (Voice Queue)　|　Balken = Zusammensetzung der Anrufe je Queue',
+    treTitle:'Trengo · DA WA (WhatsApp-Support)',
+    treSub:'Kanal „DA WA (+49 1522 3112326)"　·　Quelle: Trengo　·　Abgerufen {t}',
+    treWait:'Neu, nicht zugewiesen', treWaitSub:'offen und noch keinem Bearbeiter zugewiesen',
+    treWorking:'In Bearbeitung', treWorkingSub:'einem Agenten zugewiesen, noch nicht geschlossen',
+    treDone:'Diese Woche erledigt', treDoneSub:'Vorwoche <b>{p}</b> · Δ {d}',
+    legAns:'angenommen', legAb:'abgebrochen', legRest:'sonst. verpasst', legOther:'sonst. verpasst',
+    qCalls:'Anrufe', qRate:'Annahmequote', qAbandon:'Abbruchquote', qTotal:'Gesamt',
+    foot:'Definition: Bestand = Created + In Progress(Service) (<b>ohne</b> an Onsite-Tickets übergebene Fälle)　·　Schließung nach alp_closedstatusupdatedon　·　Region: nur DE/AT<br>Felder: Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
+    woTypeInternal:'Innen-Onsite', woTypeProvider:'Dienstleister-Onsite', woTypeShipping:'Versand',
+  }
+};
+const WO_TYPE_KEY = {'内部上门':'woTypeInternal','服务商上门':'woTypeProvider','发货':'woTypeShipping'};
+
+let LANG = localStorage.getItem('dashLang') || 'zh';
+function t(k, vars){
+  let s = (I18N[LANG] && I18N[LANG][k]) || I18N.zh[k] || k;
+  if (vars) Object.keys(vars).forEach(v => { s = s.split('{' + v + '}').join(vars[v]); });
+  return s;
+}
+function fmt(n){ return Number(n).toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN'); }
+function pc(v, d){ const s = Number(v).toFixed(d === undefined ? 1 : d); return LANG === 'de' ? s + ' %' : s + '%'; }
+
+/* 数据新鲜度：≤90 分钟=正常，≤4 小时=偏旧，>4 小时=过期（cron 每小时/20 分钟刷新，超时说明没跑成） */
+function agoText(min){
+  if (min < 1) return t('agoNow');
+  if (min < 60) return t('agoMin', {n: Math.round(min)});
+  return t('agoHr', {n: (min / 60).toFixed(1)});
+}
+function freshChip(ts){
+  if (!ts || !ts.getTime()) return '';
+  const min = (Date.now() - ts.getTime()) / 60000;
+  const cls = min <= 90 ? 'ok' : (min <= 240 ? 'warn' : 'stale');
+  return `<span class="fresh ${cls}" title="${t('freshTitle')}"><i></i>${agoText(min)}</span>`;
+}
+
+/* 自动刷新：页面是静态的，cron 在服务端推送（CRM 每小时 / Trengo 每 20 分钟）。
+   打开的标签页不会自己重新拉取 —— 所以每 5 分钟（仅当页面可见时）带 cache-buster
+   取一次线上 HTML，比较两个拉取时间戳；变了才重载，避免无意义闪烁。
+   GitHub Pages 对 HTML 有约 10 分钟 CDN 缓存，所以必须带 ?_= 时间戳绕过。 */
+const REFRESH_CHECK_MS = 5 * 60 * 1000;
+async function checkForUpdate(){
+  if (document.visibilityState !== 'visible') return;
+  try {
+    const res = await fetch(location.pathname + '?_=' + Date.now(), {cache: 'no-store'});
+    if (!res.ok) return;
+    const html = await res.text();
+    const grab = (name) => {
+      const m = html.match(new RegExp('const ' + name + ' = new Date\\((\\d+)\\)'));
+      return m ? m[1] : null;
+    };
+    const p = grab('PULLED'), tr = grab('TRENGO_PULLED');
+    if ((p && p !== String(PULLED.getTime())) || (tr && tr !== String(TRENGO_PULLED.getTime()))) {
+      location.replace(location.pathname + '?r=' + Date.now());
+    }
+  } catch (e) { /* 离线或请求失败：下一轮再试，不打扰用户 */ }
+}
+setInterval(checkForUpdate, REFRESH_CHECK_MS);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') checkForUpdate();
+});
+
+const REG = regions[0];
+function sum(map, keys){ return keys.reduce((s,k)=> s + (map[REG+'|'+k]||0), 0); }
+
+const ageKeys = ['>3m', '1-3m', '<1m'];
+const AGE_KEY = {'>3m':'ageL1', '1-3m':'ageL2', '<1m':'ageL3'};
+
+// ---- Hotline 静态数据（Genesys Cloud，脚本不更新）----
+const hotlineQueues = {
+  "德语区(DE/AT)": [
+    {name:"GER-On-Site", offer:6, answer:4, abandon:2},
+    {name:"GER_Installer", offer:4, answer:4, abandon:0},
+    {name:"GER_End_User", offer:133, answer:10, abandon:58},
+  ],
+};
+
+function delta(cur, prev, goodWhenDown){
+  const d = cur - prev;
+  const cls = d === 0 ? 'flat' : ((d > 0) !== !!goodWhenDown ? 'up' : 'down');
+  return `<span class="${cls}">${d>0?'+':''}${fmt(d)}</span>`;
+}
+
+/* ========== 渲染 ========== */
+function render(){
+  document.documentElement.lang = LANG === 'de' ? 'de' : 'zh-CN';
+  document.title = t('pageTitle');
+  document.getElementById('pageH1').textContent = t('pageTitle');
+  const ps = weekStart.toLocaleDateString('sv-SE');
+  const pe = new Date(weekStart.getTime() + 6 * 86400000);
+  const pStr = ps + ' ~ ' + pe.toLocaleDateString('sv-SE').slice(5);
+  document.getElementById('periodLine').textContent = t('period', {p: pStr});
+  document.getElementById('pulledLabel').textContent = t('pulled');
+  document.getElementById('pulledTime').textContent =
+    PULLED.toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN',
+      {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+  document.getElementById('freshCRM').innerHTML = freshChip(PULLED);
+
+  // ---- KPI ----
+  const ticketTot = sum(stock, tiers), naTot = sum(noAction, tiers);
+  const woTot = sum(woStock, types), onsiteTot = sum(onsite, tiers);
+  const naPct = ticketTot ? Math.round(naTot / ticketTot * 100) : 0;
+  const nt = sum(newThis, tiers), nl = sum(newLast, tiers);
+  const ct = sum(closedThis, tiers), cl = sum(closedLast, tiers);
+  const naCls = naPct >= 45 ? 'risk' : (naPct >= 25 ? 'warn' : '');
+  const oldTot = ageAll[REG+'|>3m'] || 0;
+  const oldShare = ticketTot ? (oldTot / ticketTot * 100) : 0;
+  const internalWO = woStock[REG+'|内部上门'] || 0;
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi">
+      <div class="k-label">${t('kStock')}</div>
+      <div class="k-val num">${fmt(ticketTot)}</div>
+      <div class="k-sub">${t('kStockSub')}</div>
+    </div>
+    <div class="kpi emph">
+      <div class="k-label">${t('kOld')}<span class="badge">${t('bOld')}</span></div>
+      <div class="k-val num">${fmt(oldTot)}</div>
+      <div class="k-sub">${t('kOldSub', {s: pc(oldShare)})}</div>
+    </div>
+    <div class="kpi ${naCls}">
+      <div class="k-label">${t('kNa')}</div>
+      <div class="k-val num">${naPct}${LANG==='de'?' %':'%'}</div>
+      <div class="k-sub">${t('kNaSub', {n: fmt(naTot)})}</div>
+    </div>
+    <div class="kpi">
+      <div class="k-label">${t('kNew')}</div>
+      <div class="k-val num">${fmt(nt)}</div>
+      <div class="k-sub">${t('kNewSub', {p: fmt(nl), d: (nt-nl>0?'+':'') + fmt(nt-nl)})}</div>
+    </div>
+    <div class="kpi">
+      <div class="k-label">${t('kClosed')}</div>
+      <div class="k-val num">${fmt(ct)}</div>
+      <div class="k-sub">${t('kClosedSub', {p: fmt(cl), d: (ct-cl>0?'+':'') + fmt(ct-cl)})}</div>
+    </div>
+    <div class="kpi emph2">
+      <div class="k-label">${t('kWO')}<span class="badge sand">${t('bOwn')}</span></div>
+      <div class="k-val num">${fmt(internalWO)}</div>
+      <div class="k-sub">${t('kWOSub')}</div>
+    </div>`;
+
+  // ---- Ticket 分层 ----
+  let segs = '', cells = '';
+  tiers.forEach((tr, i)=>{
+    const s = stock[REG+'|'+tr] || 0;
+    const na = noAction[REG+'|'+tr] || 0;
+    const share = ticketTot ? (s / ticketTot * 100) : 0;
+    const naPctT = s ? (na / s * 100) : 0;
+    segs += `<div class="seg s${i+1}" style="width:${share}%" title="${tr} ${fmt(s)}">${share >= 5 ? tr : ''}</div>`;
+    const c = naPctT >= 45 ? 'risk' : (naPctT >= 25 ? 'warn' : '');
+    cells += `
+      <div class="tier-cell c${i+1}">
+        <div class="t-name">${tr}<span class="t-val num">${fmt(s)}</span></div>
+        <div class="t-meta ${c}">${t('tierShare', {s: pc(share)})} · ${t('tierNa')} ${fmt(na)}（${pc(naPctT, 0)}）</div>
+      </div>`;
+  });
+  document.getElementById('tierTitle').textContent = t('tierTitle');
+  const tierStackEl = document.getElementById('tierStack');
+  tierStackEl.innerHTML = segs;
+  tierStackEl.setAttribute('aria-label', tiers.map(tr =>
+    `${tr} ${fmt(stock[REG+'|'+tr] || 0)}`).join('，'));
+  document.getElementById('tierGrid').innerHTML = cells;
+  document.getElementById('tierSub').textContent =
+    t('tierSub', {tot: fmt(ticketTot), na: fmt(naTot), pct: naPct});
+
+  // ---- 账龄 ----
+  const ageAllTot = ageKeys.reduce((s, k)=> s + (ageAll[REG+'|'+k] || 0), 0);
+  const ageNewTot = ageKeys.reduce((s, k)=> s + (ageNew[REG+'|'+k] || 0), 0);
+  let aSegs = '', aCells = '';
+  ageKeys.forEach((k, i)=>{
+    const v = ageAll[REG+'|'+k] || 0;
+    const nv = ageNew[REG+'|'+k] || 0;
+    const share = ageAllTot ? (v / ageAllTot * 100) : 0;
+    const lbl = t(AGE_KEY[k]);
+    aSegs += `<div class="seg g${i+1}" style="width:${share}%" title="${lbl} ${fmt(v)}">${share >= 8 ? k : ''}</div>`;
+    aCells += `
+      <div class="age-cell a${i+1}${k === '>3m' ? ' hot' : ''}">
+        <div class="a-name">${lbl}<span class="a-val num">${fmt(v)}</span>${k === '>3m' ? `<span class="a-flag">${t('ageFlag')}</span>` : ''}</div>
+        <div class="a-meta">${t('ageShare', {s: pc(share)})} · ${t('ageNew')} ${fmt(nv)}${nv ? `（${t('ageOf', {s: pc(v ? nv/v*100 : 0, 0)})}）` : ''}</div>
+      </div>`;
+  });
+  document.getElementById('tierBlkName').textContent = t('tierBlk');
+  document.getElementById('ageBlkName').textContent =
+    t('ageBlk') + '　·　' + t('ageSub', {tot: fmt(ageAllTot), nw: fmt(ageNewTot)});
+  const ageStackEl = document.getElementById('ageStackAll');
+  ageStackEl.innerHTML = aSegs;
+  ageStackEl.setAttribute('aria-label', ageKeys.map(k =>
+    `${t(AGE_KEY[k])} ${fmt(ageAll[REG+'|'+k] || 0)}`).join('，'));
+  document.getElementById('ageGrid').innerHTML = aCells;
+
+  // ---- 本周变化 ----
+  document.getElementById('deltaTitle').textContent = t('deltaTitle');
+  document.getElementById('deltaSub').textContent = t('deltaSub');
+  document.getElementById('deltaNote').textContent = t('deltaNote');
+  document.getElementById('deltaTable').innerHTML = `
+    <caption class="sr-only">${t('deltaTitle')}</caption>
+    <tr><th scope="col">${t('thMetric')}</th><th scope="col">${t('thThis')}</th><th scope="col">${t('thLast')}</th><th scope="col">${t('thDelta')}</th></tr>
+    <tr><td>${t('rowNew')}</td><td class="num">${fmt(nt)}</td><td class="num">${fmt(nl)}</td><td class="num">${delta(nt,nl,true)}</td></tr>
+    <tr><td>${t('rowClosed')}</td><td class="num">${fmt(ct)}</td><td class="num">${fmt(cl)}</td><td class="num">${delta(ct,cl,false)}</td></tr>
+    <tr class="total"><td>${t('rowNet')}</td><td class="num">${(nt-ct>0?'+':'')}${fmt(nt-ct)}</td><td class="num">${(nl-cl>0?'+':'')}${fmt(nl-cl)}</td><td class="num">${delta(nt-ct, nl-cl, true)}</td></tr>`;
+
+  // ---- WO ----
+  let wRows = '';
+  types.forEach(ty=>{
+    const v = woStock[REG+'|'+ty] || 0;
+    const hot = ty === '内部上门';
+    wRows += `<tr${hot ? ' class="hot"' : ''}><td>${t(WO_TYPE_KEY[ty])}${hot ? ' · ' + t('woOwn') : ''}</td><td class="num">${fmt(v)}</td></tr>`;
+  });
+  wRows += `<tr class="total"><td>${t('woTotal')}</td><td class="num">${fmt(woTot)}</td></tr>`;
+  document.getElementById('woTitle').textContent = t('woTitle');
+  document.getElementById('woSub').textContent = t('woSub');
+  document.getElementById('woTable').innerHTML = wRows;
+  document.getElementById('woNote').innerHTML = t('woNote', {n: fmt(onsiteTot)});
+
+  // ---- Trengo · DA WA ----
+  const treDT = TRENGO_PULLED.getTime()
+    ? TRENGO_PULLED.toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN',
+        {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+    : '—';
+  document.getElementById('trengoTitle').textContent = t('treTitle');
+  document.getElementById('trengoSub').innerHTML = t('treSub', {t: treDT}) + '　' + freshChip(TRENGO_PULLED);
+  const treDelta = trengoClosedThis - trengoClosedLast;
+  document.getElementById('treGrid').innerHTML = `
+    <div class="tre-cell">
+      <div class="tre-name">${t('treWait')}</div>
+      <div class="tre-val num">${fmt(trengoNew)}</div>
+      <div class="tre-sub">${t('treWaitSub')}</div>
+    </div>
+    <div class="tre-cell k-work">
+      <div class="tre-name">${t('treWorking')}</div>
+      <div class="tre-val num">${fmt(trengoAssigned)}</div>
+      <div class="tre-sub">${t('treWorkingSub')}</div>
+    </div>
+    <div class="tre-cell k-done">
+      <div class="tre-name">${t('treDone')}</div>
+      <div class="tre-val num">${fmt(trengoClosedThis)}</div>
+      <div class="tre-sub">${t('treDoneSub', {p: fmt(trengoClosedLast),
+        d: (treDelta > 0 ? '+' : '') + fmt(treDelta)})}</div>
+    </div>`;
+
+  // ---- Hotline ----
+  document.getElementById('hotlineTitle').textContent = t('hotlineTitle');
+  document.getElementById('hotlineSub').textContent = t('hotlineSub');
+  document.getElementById('hotlineLegend').innerHTML =
+    `<span><i class="l-ans"></i>${t('legAns')}</span>
+     <span><i class="l-ab"></i>${t('legAb')}</span>
+     <span><i class="l-rest"></i>${t('legRest')}</span>`;
+  const hb = document.getElementById('hotlineBars');
+  const queues = hotlineQueues[REG];
+  if(!queues){
+    hb.innerHTML = `<div class="sub">—</div>`;
+  } else {
+    const tOffer = queues.reduce((s,q)=>s+q.offer,0);
+    const tAns = queues.reduce((s,q)=>s+q.answer,0);
+    const tAb = queues.reduce((s,q)=>s+q.abandon,0);
+    function bar(q){
+      const aPct = q.offer ? q.answer / q.offer * 100 : 0;
+      const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
+      const restPct = Math.max(0, 100 - aPct - abPct);
+      return `<div class="q-bar">
+          <div class="seg answered" style="width:${aPct}%"></div>
+          <div class="seg abandoned" style="width:${abPct}%"></div>
+          <div class="seg rest" style="width:${restPct}%"></div>
+        </div>`;
+    }
+    const rate = (p) => p < 50 ? 'low' : (p < 80 ? 'mid' : '');
+    let rows = '';
+    queues.forEach(q=>{
+      const aPct = q.offer ? q.answer / q.offer * 100 : 0;
+      const abPct = q.offer ? q.abandon / q.offer * 100 : 0;
+      rows += `
+        <div class="q-row">
+          <div class="q-name">${q.name}</div>
+          ${bar(q)}
+          <div class="q-stats">
+            <span>${t('qCalls')} <b>${fmt(q.offer)}</b></span>
+            <span class="rate ${rate(aPct)}">${t('qRate')} <b>${pc(aPct, 1)}</b></span>
+            <span>${t('qAbandon')} <b class="${abPct>=30?'up':''}">${pc(abPct, 1)}</b></span>
+          </div>
+        </div>`;
+    });
+    const tAPct = tOffer ? tAns/tOffer*100 : 0;
+    const tAbPct = tOffer ? tAb/tOffer*100 : 0;
+    rows += `
+      <div class="q-row" style="margin-top:10px;border-top:1px solid var(--ink);padding-top:9px;">
+        <div class="q-name">${t('qTotal')}</div>
+        ${bar({offer:tOffer, answer:tAns, abandon:tAb})}
+        <div class="q-stats">
+          <span>${t('qCalls')} <b>${fmt(tOffer)}</b></span>
+          <span class="rate ${rate(tAPct)}">${t('qRate')} <b>${pc(tAPct, 1)}</b></span>
+          <span>${t('qAbandon')} <b class="${tAbPct>=30?'up':''}">${pc(tAbPct, 1)}</b></span>
+        </div>
+      </div>`;
+    hb.innerHTML = rows;
+  }
+
+  // ---- 页脚 ----
+  document.getElementById('footNote').innerHTML = t('foot') + '　' + t('autoRefresh');
+
+  // ---- 语言按钮状态 ----
+  document.querySelectorAll('#langSwitch button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.lang === LANG);
+  });
+}
+
+document.querySelectorAll('#langSwitch button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    LANG = b.dataset.lang;
+    localStorage.setItem('dashLang', LANG);
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
