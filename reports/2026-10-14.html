@@ -322,27 +322,27 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1791986435536);
+const PULLED = new Date(1791993635529);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2476,"德语区(DE/AT)|L2":118,"德语区(DE/AT)|L3":80,"德语区(DE/AT)|L4":46};
-const noAction = {"德语区(DE/AT)|L1":466,"德语区(DE/AT)|L2":16,"德语区(DE/AT)|L3":21,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":574,"德语区(DE/AT)|L2":6,"德语区(DE/AT)|L3":513,"德语区(DE/AT)|L4":0};
-const newThis = {"德语区(DE/AT)|L1":219,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":8,"德语区(DE/AT)|L4":11};
-const newLast = {"德语区(DE/AT)|L1":337,"德语区(DE/AT)|L2":9,"德语区(DE/AT)|L3":26,"德语区(DE/AT)|L4":9};
-const closedThis = {"德语区(DE/AT)|L1":248,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":0};
+const stock = {"德语区(DE/AT)|L1":2460,"德语区(DE/AT)|L2":116,"德语区(DE/AT)|L3":69,"德语区(DE/AT)|L4":52};
+const noAction = {"德语区(DE/AT)|L1":457,"德语区(DE/AT)|L2":12,"德语区(DE/AT)|L3":21,"德语区(DE/AT)|L4":1};
+const onsite = {"德语区(DE/AT)|L1":576,"德语区(DE/AT)|L2":6,"德语区(DE/AT)|L3":519,"德语区(DE/AT)|L4":0};
+const newThis = {"德语区(DE/AT)|L1":227,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":8,"德语区(DE/AT)|L4":12};
+const newLast = {"德语区(DE/AT)|L1":337,"德语区(DE/AT)|L2":9,"德语区(DE/AT)|L3":24,"德语区(DE/AT)|L4":11};
+const closedThis = {"德语区(DE/AT)|L1":271,"德语区(DE/AT)|L2":6,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":0};
 const closedLast = {"德语区(DE/AT)|L1":352,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":55,"德语区(DE/AT)|L4":3};
-const woStock = {"德语区(DE/AT)|发货":320,"德语区(DE/AT)|内部上门":54,"德语区(DE/AT)|服务商上门":71};
-const ageAll = {"德语区(DE/AT)|>3m":394,"德语区(DE/AT)|1-3m":1189,"德语区(DE/AT)|<1m":1137};
-const ageNew = {"德语区(DE/AT)|>3m":18,"德语区(DE/AT)|1-3m":601,"德语区(DE/AT)|<1m":608};
+const woStock = {"德语区(DE/AT)|发货":326,"德语区(DE/AT)|内部上门":54,"德语区(DE/AT)|服务商上门":71};
+const ageAll = {"德语区(DE/AT)|>3m":395,"德语区(DE/AT)|1-3m":1179,"德语区(DE/AT)|<1m":1123};
+const ageNew = {"德语区(DE/AT)|>3m":18,"德语区(DE/AT)|1-3m":593,"德语区(DE/AT)|<1m":596};
 const weekStart = new Date(1791756000000);
-const trengoNew = 2;            // DA WA 新单待分派
-const trengoOpen = 2;           // DA WA 未关闭（OPEN 全部）
-const trengoAssigned = 15;       // DA WA 处理中
-const trengoClosedThis = 124;     // DA WA 本周已处理
-const trengoClosedLast = 279;     // DA WA 上周已处理
-const TRENGO_PULLED = new Date(1791986435536);
+const trengoNew = 0;            // DA WA 新单待分派
+const trengoOpen = 0;           // DA WA 未关闭（OPEN 全部）
+const trengoAssigned = 6;       // DA WA 处理中
+const trengoClosedThis = 137;     // DA WA 本周已处理
+const trengoClosedLast = 277;     // DA WA 上周已处理
+const TRENGO_PULLED = new Date(1791993635529);
 
 /* ========== 双语词典 ========== */
 const I18N = {
