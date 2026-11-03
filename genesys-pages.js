@@ -14,8 +14,8 @@
   host.append(panel);
   const lang = () => document.querySelector('#langSwitch button.on')?.dataset.lang === 'de' ? 'de' : 'zh';
   const words = {
-    zh:['Genesys 队列监控 · 准实时','正在读取 Genesys 数据…','数据不可用','采集时间','数据过期','队列','排队','最长等待','接通率 / 30分钟','接听 / 30分钟','坐席工作量 / 30分钟','坐席','处理时间 / 分钟','个人工作量未公开','GitHub 每5分钟计划采集（可能延迟）'],
-    de:['Genesys Queues · Zeitversetzt','Genesys-Daten werden geladen…','Daten nicht verfügbar','Erfasst am','Daten veraltet','Queue','Wartend','Längste Wartezeit','Annahmequote / 30 Min.','Angenommen / 30 Min.','Agentenleistung / 30 Min.','Agent','Bearbeitungszeit / Min.','Persönliche Leistungsdaten nicht veröffentlicht','GitHub-Abfrage geplant alle 5 Min. (Verzögerungen möglich)']
+    zh:['Genesys 每日队列报告','正在读取 Genesys 数据…','数据不可用','采集时间','数据过期','队列','排队','最长等待','今日接通率','今日接听','坐席工作量 / 30分钟','坐席','处理时间 / 分钟','个人工作量未公开','每天德国时间 17:00 计划采集（可能延迟）'],
+    de:['Genesys täglicher Queue-Bericht','Genesys-Daten werden geladen…','Daten nicht verfügbar','Erfasst am','Daten veraltet','Queue','Wartend','Längste Wartezeit','Annahmequote heute','Angenommen heute','Agentenleistung / 30 Min.','Agent','Bearbeitungszeit / Min.','Persönliche Leistungsdaten nicht veröffentlicht','Täglich 17:00 Uhr Berlin (Verzögerungen möglich)']
   };
   const t = i => words[lang()][i];
   const el = (tag,text) => {const x=document.createElement(tag); if(text!==undefined)x.textContent=String(text);return x;};
@@ -25,7 +25,7 @@
     heading.textContent=t(0);area.replaceChildren();
     if(!data){status.textContent=error?t(2)+': '+error:t(1);return;}
     const timestamp=Date.parse(data.generated_at_utc);
-    const stale=!Number.isFinite(timestamp)||Date.now()-timestamp>15*60*1000||timestamp-Date.now()>60*1000;
+    const stale=!Number.isFinite(timestamp)||Date.now()-timestamp>30*60*60*1000||timestamp-Date.now()>60*1000;
     status.textContent=t(3)+' '+(Number.isFinite(timestamp)?new Date(timestamp).toLocaleString(lang()==='de'?'de-DE':'zh-CN'):'—')+(stale?' · '+t(4):'')+' · '+t(14);
     status.style.color=stale?'var(--danger-ink)':'var(--ink-soft)';
     const table=el('table');table.style.minWidth='390px';
@@ -66,5 +66,5 @@
     render();
   }
   document.querySelector('#langSwitch')?.addEventListener('click',()=>setTimeout(render,0));
-  load();setInterval(load,60*1000);
+  load();setInterval(load,5*60*1000);
 })();
