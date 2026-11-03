@@ -33,7 +33,7 @@ jobs:
             echo "enabled=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          python -m genesys.collect
+          python -m genesys.daily_collect
           echo "enabled=true" >> "$GITHUB_OUTPUT"
       - name: Commit snapshot
         if: steps.fetch.outputs.enabled == 'true'
