@@ -106,7 +106,7 @@
   .dash .two-col{gap:14px;margin:0;}
   @media (max-width:1180px){
     .dash{grid-template-columns:1fr;}
-    .col-side{order:-1;}          /* 窄屏时 Trengo / Hotline 仍在 Ticket 明细之前 */
+    .col-side{order:-1;}          /* 窄屏时 Hotline 仍在 Ticket 明细之前 */
   }
   /* 显示器高度不够时整体收紧，尽量一屏 */
   @media (max-height:960px){
@@ -305,7 +305,7 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1793718787340);
+const PULLED = new Date(1793718853577);
 const regions = ['德语区(DE/AT)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
@@ -414,7 +414,7 @@ function freshChip(ts){
   return `<span class="fresh ${cls}" title="${t('freshTitle')}"><i></i>${agoText(min)}</span>`;
 }
 
-/* 自动刷新：页面是静态的，cron 在服务端推送（CRM 每小时 / Trengo 每 20 分钟）。
+/* 自动刷新：页面是静态的，cron 在服务端推送（CRM 每小时）。
    打开的标签页不会自己重新拉取 —— 所以每 5 分钟（仅当页面可见时）带 cache-buster
    取一次线上 HTML，比较两个拉取时间戳；变了才重载，避免无意义闪烁。
    GitHub Pages 对 HTML 有约 10 分钟 CDN 缓存，所以必须带 ?_= 时间戳绕过。 */
@@ -429,8 +429,8 @@ async function checkForUpdate(){
       const m = html.match(new RegExp('const ' + name + ' = new Date\\((\\d+)\\)'));
       return m ? m[1] : null;
     };
-    const p = grab('PULLED'), tr = grab('TRENGO_PULLED');
-    if ((p && p !== String(PULLED.getTime())) || (tr && tr !== String(TRENGO_PULLED.getTime()))) {
+    const p = grab('PULLED');
+    if (p && p !== String(PULLED.getTime())) {
       location.replace(location.pathname + '?r=' + Date.now());
     }
   } catch (e) { /* 离线或请求失败：下一轮再试，不打扰用户 */ }
