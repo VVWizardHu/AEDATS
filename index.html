@@ -270,20 +270,20 @@
 
 <script>
 /* ========== 数据块（脚本自动替换，勿手改） ========== */
-const PULLED = new Date(1794330014577);
-const regions = ['德语区(DE/AT)'];
+const PULLED = new Date(1794386163813);
+const regions = ['德语区(DE/AT/CH)'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['内部上门','服务商上门','发货'];
-const stock = {"德语区(DE/AT)|L1":2055,"德语区(DE/AT)|L2":99,"德语区(DE/AT)|L3":26,"德语区(DE/AT)|L4":54};
-const noAction = {"德语区(DE/AT)|L1":441,"德语区(DE/AT)|L2":12,"德语区(DE/AT)|L3":3,"德语区(DE/AT)|L4":1};
-const onsite = {"德语区(DE/AT)|L1":594,"德语区(DE/AT)|L2":11,"德语区(DE/AT)|L3":692,"德语区(DE/AT)|L4":1};
-const newThis = {"德语区(DE/AT)|L1":85,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":2,"德语区(DE/AT)|L4":8};
-const newLast = {"德语区(DE/AT)|L1":335,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":16,"德语区(DE/AT)|L4":6};
-const closedThis = {"德语区(DE/AT)|L1":232,"德语区(DE/AT)|L2":2,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":440,"德语区(DE/AT)|L2":7,"德语区(DE/AT)|L3":33,"德语区(DE/AT)|L4":2};
-const woStock = {"德语区(DE/AT)|发货":374,"德语区(DE/AT)|内部上门":62,"德语区(DE/AT)|服务商上门":90};
-const ageAll = {"德语区(DE/AT)|>3m":319,"德语区(DE/AT)|1-3m":1043,"德语区(DE/AT)|<1m":872};
-const ageNew = {"德语区(DE/AT)|>3m":0,"德语区(DE/AT)|1-3m":205,"德语区(DE/AT)|<1m":9};
+const stock = {"德语区(DE/AT/CH)|L1":1964,"德语区(DE/AT/CH)|L2":98,"德语区(DE/AT/CH)|L3":27,"德语区(DE/AT/CH)|L4":31};
+const noAction = {"德语区(DE/AT/CH)|L1":388,"德语区(DE/AT/CH)|L2":10,"德语区(DE/AT/CH)|L3":4,"德语区(DE/AT/CH)|L4":1};
+const onsite = {"德语区(DE/AT/CH)|L1":592,"德语区(DE/AT/CH)|L2":11,"德语区(DE/AT/CH)|L3":690,"德语区(DE/AT/CH)|L4":2};
+const newThis = {"德语区(DE/AT/CH)|L1":106,"德语区(DE/AT/CH)|L2":2,"德语区(DE/AT/CH)|L3":1,"德语区(DE/AT/CH)|L4":1};
+const newLast = {"德语区(DE/AT/CH)|L1":327,"德语区(DE/AT/CH)|L2":5,"德语区(DE/AT/CH)|L3":17,"德语区(DE/AT/CH)|L4":4};
+const closedThis = {"德语区(DE/AT/CH)|L1":311,"德语区(DE/AT/CH)|L2":3,"德语区(DE/AT/CH)|L3":11,"德语区(DE/AT/CH)|L4":0};
+const closedLast = {"德语区(DE/AT/CH)|L1":437,"德语区(DE/AT/CH)|L2":7,"德语区(DE/AT/CH)|L3":33,"德语区(DE/AT/CH)|L4":2};
+const woStock = {"德语区(DE/AT/CH)|发货":377,"德语区(DE/AT/CH)|内部上门":62,"德语区(DE/AT/CH)|服务商上门":92};
+const ageAll = {"德语区(DE/AT/CH)|>3m":295,"德语区(DE/AT/CH)|1-3m":974,"德语区(DE/AT/CH)|<1m":851};
+const ageNew = {"德语区(DE/AT/CH)|>3m":0,"德语区(DE/AT/CH)|1-3m":194,"德语区(DE/AT/CH)|<1m":10};
 const weekStart = new Date(1794178800000);
 
 /* ========== 双语词典 ========== */
@@ -314,7 +314,7 @@ const I18N = {
     woTitle:'Work Order 存量 · 分类型', woSub:'未完成工单，剔除已发货(Shipped)',
     woOwn:'自有团队', woTotal:'合计',
     woNote:'已转上门工单 <b>{n}</b> 条单独统计，不计入 Ticket 存量',
-    foot:'口径：存量 = Created + In Progress(Service)（<b>不含</b>已转上门工单）　·　关闭以 alp_closedstatusupdatedon 为准　·　地区仅德语区(DE/AT)<br>字段：Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
+    foot:'口径：存量 = Created + In Progress(Service)（<b>不含</b>已转上门工单）　·　关闭以 alp_closedstatusupdatedon 为准　·　地区德语区(DE/AT/CH)　·　业务线限 Residential + C&I ESS<br>字段：Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
     woTypeInternal:'内部上门', woTypeProvider:'服务商上门', woTypeShipping:'发货',
   },
   de: {
@@ -343,7 +343,7 @@ const I18N = {
     woTitle:'Work-Order-Bestand · nach Typ', woSub:'Offene Aufträge, ohne versandte (Shipped)',
     woOwn:'eigenes Team', woTotal:'Gesamt',
     woNote:'<b>{n}</b> an Onsite-Tickets übergeben (separat gezählt, nicht im Ticket-Bestand)',
-    foot:'Definition: Bestand = Created + In Progress(Service) (<b>ohne</b> an Onsite-Tickets übergebene Fälle)　·　Schließung nach alp_closedstatusupdatedon　·　Region: nur DE/AT<br>Felder: Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
+    foot:'Definition: Bestand = Created + In Progress(Service) (<b>ohne</b> an Onsite-Tickets übergebene Fälle)　·　Schließung nach alp_closedstatusupdatedon　·　Region: DE/AT/CH　·　Business Line: Residential + C&I ESS<br>Felder: Ticket alp_casegrade/alp_casestatus　·　WO alp_chooseprocessingmethod/alp_onsitemethod/msdyn_systemstatus',
     woTypeInternal:'Innen-Onsite', woTypeProvider:'Dienstleister-Onsite', woTypeShipping:'Versand',
   }
 };
