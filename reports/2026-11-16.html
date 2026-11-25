@@ -130,10 +130,7 @@
     .tier-cell .t-val,.age-cell .a-val{font-size:19px;margin-top:1px;}
     .age-cell.hot .a-val{font-size:23px;}
     .tier-cell .t-name,.age-cell .a-name,.tier-cell .t-meta,.age-cell .a-meta{font-size:10px;}
-    .tre-grid,.tier-grid,.age-grid{gap:9px;}
-    .tre-cell{padding:8px 11px;}
-    .tre-cell .tre-val{font-size:22px;}
-    .tre-cell .tre-sub{font-size:10px;margin-top:2px;}
+    .tier-grid,.age-grid{gap:9px;}
     table{font-size:12px;}
     td{padding:2px 0;}
     th{padding-bottom:4px;}
@@ -373,7 +370,7 @@ function freshChip(ts){
 
 /* 自动刷新：页面是静态的，cron 在服务端推送（CRM 每小时）。
    打开的标签页不会自己重新拉取 —— 所以每 5 分钟（仅当页面可见时）带 cache-buster
-   取一次线上 HTML，比较两个拉取时间戳；变了才重载，避免无意义闪烁。
+   取一次线上 HTML，比较拉取时间戳；变了才重载，避免无意义闪烁。
    GitHub Pages 对 HTML 有约 10 分钟 CDN 缓存，所以必须带 ?_= 时间戳绕过。 */
 const REFRESH_CHECK_MS = 5 * 60 * 1000;
 async function checkForUpdate(){
