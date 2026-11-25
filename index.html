@@ -43,11 +43,6 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;z-index:50;
     background:linear-gradient(90deg,var(--brand) 0,var(--c1) 50%,var(--c3) 100%);}
   .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
-  /* 数据新鲜度：圆点 = 状态指示（非文字 UI，对卡片白 ≥3:1）*/
-  .fresh{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
-  .fresh i{width:7px;height:7px;border-radius:50%;background:var(--c1);flex:0 0 auto;}
-  .fresh.warn i{background:var(--warn);}
-  .fresh.stale i{background:var(--danger);}
   /* 表格行 hover：扫读定位用。按标准"几十次/天"档 → 不做过渡动画，只给静态反馈；
      并用 @media (hover:hover) 门控，避免触屏上"粘住" */
   @media (hover:hover){ tbody tr:hover td{background:var(--brand-soft);} }
@@ -84,7 +79,6 @@
     border-radius:var(--radius-sm);padding:12px 13px 13px;position:relative;box-shadow:var(--shadow-card);}
   .kpi.warn{border-top-color:var(--warn);}
   .kpi.risk{border-top-color:var(--danger);}
-  .kpi.muted{border-top-color:var(--ink-soft);}
   .kpi .k-label{font-size:10.5px;color:var(--ink-soft);letter-spacing:.3px;text-transform:uppercase;line-height:1.35;}
   .kpi .k-val{font-size:26px;font-weight:600;line-height:1.15;margin-top:5px;}
   .kpi .k-sub{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.4;}
@@ -104,9 +98,6 @@
   .col-main{display:flex;flex-direction:column;gap:14px;min-width:0;}
   .dash .card{margin-bottom:0;}
   .dash .two-col{gap:14px;margin:0;}
-  @media (max-width:1180px){
-    .dash{grid-template-columns:1fr;}
-  }
   /* 显示器高度不够时整体收紧，尽量一屏 */
   @media (max-height:960px){
     .wrap{padding:10px 16px 12px;}
@@ -130,15 +121,11 @@
     .tier-cell .t-val,.age-cell .a-val{font-size:19px;margin-top:1px;}
     .age-cell.hot .a-val{font-size:23px;}
     .tier-cell .t-name,.age-cell .a-name,.tier-cell .t-meta,.age-cell .a-meta{font-size:10px;}
-    .tre-grid,.tier-grid,.age-grid{gap:9px;}
-    .tre-cell{padding:8px 11px;}
-    .tre-cell .tre-val{font-size:22px;}
-    .tre-cell .tre-sub{font-size:10px;margin-top:2px;}
+    .tier-grid,.age-grid{gap:9px;}
     table{font-size:12px;}
     td{padding:2px 0;}
     th{padding-bottom:4px;}
     footer{padding-top:5px;margin-top:7px;font-size:10px;line-height:1.4;}
-  }
   }
 
   .card{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);
@@ -201,7 +188,6 @@
   td:first-child{text-align:left;font-weight:500;}
   tr.total td{border-top:1px solid var(--ink);border-bottom:none;font-weight:600;}
   .up{color:var(--danger-ink);} .down{color:var(--ok);} .flat{color:var(--ink-soft);}
-  .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;background:var(--c1-soft);color:var(--c1-ink);}
   .note{font-size:10.5px;color:var(--ink-soft);border-top:1px dashed var(--hair-soft);padding-top:7px;margin-top:8px;line-height:1.45;}
 
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
@@ -225,7 +211,7 @@
         <button type="button" data-lang="zh">中文</button>
         <button type="button" data-lang="de">Deutsch</button>
       </div>
-      <div class="pulled"><span id="pulledLabel"></span><span class="num" id="pulledTime"></span><span id="freshCRM"></span></div>
+      <div class="pulled"><span id="pulledLabel"></span><span class="num" id="pulledTime"></span></div>
     </div>
   </header>
 
@@ -269,7 +255,7 @@
 </div>
 
 <script>
-/* ========== 数据块（脚本自动替换，勿手改） ========== */
+/* ========== 数据块（静态快照，拉取时间见 PULLED；自动更新已停用） ========== */
 const PULLED = new Date(1795615200356);
 const regions = ['德语区(DE/AT/CH)'];
 const tiers = ['L1','L2','L3','L4'];
@@ -292,7 +278,6 @@ const I18N = {
     pageTitle:'DA 技术服务日常看板',
     period:'周期 {p}　·　数据来源 D365 CRM',
     pulled:'拉取时间',
-    agoNow:'刚刚', agoMin:'{n} 分钟前', agoHr:'{n} 小时前', freshTitle:'数据新鲜度', autoRefresh:'· 每 5 分钟自动检查更新',
     kStock:'Ticket 存量', kStockSub:'未关闭待处理客诉',
     kOld:'超 3 个月未关闭', kOldSub:'占存量 {s} · 优先清理', bOld:'积压',
     kNa:'无动作', kNaSub:'{n} 条 · 5 个工作日无更新',
@@ -303,7 +288,6 @@ const I18N = {
     tierBlk:'按客诉等级（L1–L4）', ageBlk:'按创建时间账龄（未关闭）',
     tierSub:'合计 {tot} · 其中无动作 {na}（{pct}%）　｜　占比条 = 各层级构成',
     tierShare:'占 DA 存量 {s}', tierNa:'无动作',
-    ageTitle:'客诉账龄 · 未关闭 / 新建未处理',
     ageSub:'未关闭合计 {tot}（按创建时间分档）；其中「新建未处理」(状态=Created) {nw} 条',
     ageL1:'超过 3 个月', ageL2:'1 – 3 个月', ageL3:'1 个月以内',
     ageFlag:'优先清理', ageShare:'占未关闭 {s}', ageNew:'新建未处理', ageOf:'占本档 {s}',
@@ -321,7 +305,6 @@ const I18N = {
     pageTitle:'DA Technischer Service – Tagesübersicht',
     period:'Zeitraum {p}　·　Datenquelle: D365 CRM',
     pulled:'Abgerufen',
-    agoNow:'gerade eben', agoMin:'vor {n} Min.', agoHr:'vor {n} Std.', freshTitle:'Datenaktualität', autoRefresh:'· prüft alle 5 Min. automatisch',
     kStock:'Ticket-Bestand', kStockSub:'Offene, unbearbeitete Fälle',
     kOld:'Offen über 3 Monate', kOldSub:'{s} des Bestands · vorrangig bearbeiten', bOld:'Rückstand',
     kNa:'Ohne Aktivität', kNaSub:'{n} Fälle · 5 Werktage ohne Update',
@@ -332,7 +315,6 @@ const I18N = {
     tierBlk:'nach Ebene (L1–L4)', ageBlk:'nach Alter (offen)',
     tierSub:'Gesamt {tot} · davon ohne Aktivität {na} ({pct} %)　|　Balken = Zusammensetzung nach Ebene',
     tierShare:'Anteil am DA-Bestand {s}', tierNa:'ohne Aktivität',
-    ageTitle:'Fallalter · offen / neu & unbearbeitet',
     ageSub:'Offen gesamt {tot} (nach Erstellungsdatum); davon „neu & unbearbeitet" (Status = Created) {nw}',
     ageL1:'über 3 Monate', ageL2:'1 – 3 Monate', ageL3:'bis 1 Monat',
     ageFlag:'priorisieren', ageShare:'{s} der offenen', ageNew:'neu & unbearbeitet', ageOf:'{s} der Gruppe',
@@ -357,45 +339,6 @@ function t(k, vars){
 }
 function fmt(n){ return Number(n).toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN'); }
 function pc(v, d){ const s = Number(v).toFixed(d === undefined ? 1 : d); return LANG === 'de' ? s + ' %' : s + '%'; }
-
-/* 数据新鲜度：≤90 分钟=正常，≤4 小时=偏旧，>4 小时=过期（cron 每小时/20 分钟刷新，超时说明没跑成） */
-function agoText(min){
-  if (min < 1) return t('agoNow');
-  if (min < 60) return t('agoMin', {n: Math.round(min)});
-  return t('agoHr', {n: (min / 60).toFixed(1)});
-}
-function freshChip(ts){
-  if (!ts || !ts.getTime()) return '';
-  const min = (Date.now() - ts.getTime()) / 60000;
-  const cls = min <= 90 ? 'ok' : (min <= 240 ? 'warn' : 'stale');
-  return `<span class="fresh ${cls}" title="${t('freshTitle')}"><i></i>${agoText(min)}</span>`;
-}
-
-/* 自动刷新：页面是静态的，cron 在服务端推送（CRM 每小时）。
-   打开的标签页不会自己重新拉取 —— 所以每 5 分钟（仅当页面可见时）带 cache-buster
-   取一次线上 HTML，比较两个拉取时间戳；变了才重载，避免无意义闪烁。
-   GitHub Pages 对 HTML 有约 10 分钟 CDN 缓存，所以必须带 ?_= 时间戳绕过。 */
-const REFRESH_CHECK_MS = 5 * 60 * 1000;
-async function checkForUpdate(){
-  if (document.visibilityState !== 'visible') return;
-  try {
-    const res = await fetch(location.pathname + '?_=' + Date.now(), {cache: 'no-store'});
-    if (!res.ok) return;
-    const html = await res.text();
-    const grab = (name) => {
-      const m = html.match(new RegExp('const ' + name + ' = new Date\\((\\d+)\\)'));
-      return m ? m[1] : null;
-    };
-    const p = grab('PULLED');
-    if (p && p !== String(PULLED.getTime())) {
-      location.replace(location.pathname + '?r=' + Date.now());
-    }
-  } catch (e) { /* 离线或请求失败：下一轮再试，不打扰用户 */ }
-}
-setInterval(checkForUpdate, REFRESH_CHECK_MS);
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') checkForUpdate();
-});
 
 const REG = regions[0];
 function sum(map, keys){ return keys.reduce((s,k)=> s + (map[REG+'|'+k]||0), 0); }
@@ -422,7 +365,6 @@ function render(){
   document.getElementById('pulledTime').textContent =
     PULLED.toLocaleString(LANG === 'de' ? 'de-DE' : 'zh-CN',
       {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
-  document.getElementById('freshCRM').innerHTML = freshChip(PULLED);
 
   // ---- KPI ----
   const ticketTot = sum(stock, tiers), naTot = sum(noAction, tiers);
@@ -540,7 +482,7 @@ function render(){
   document.getElementById('woNote').innerHTML = t('woNote', {n: fmt(onsiteTot)});
 
   // ---- 页脚 ----
-  document.getElementById('footNote').innerHTML = t('foot') + '　' + t('autoRefresh');
+  document.getElementById('footNote').innerHTML = t('foot');
 
   // ---- 语言按钮状态 ----
   document.querySelectorAll('#langSwitch button').forEach(b=>{
